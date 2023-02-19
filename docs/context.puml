@@ -10,7 +10,7 @@ System_Ext(mobile_device, "Mobile Device")
 System_Ext(cloud, "Cloud")
 
 
-Rel(signalk_rserver, signalk_gateway, "Gets updates from")
+Rel(signalk_rserver, signalk_gateway, "Gets updates from", "websocket")
 Rel(signalk_rserver, cloud, "Sends updates to")
 Rel(mobile_device, signalk_rserver, "Gets navigation data from")
 

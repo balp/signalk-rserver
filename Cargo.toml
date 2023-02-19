@@ -6,8 +6,15 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+tokio = { version = "1", features = ["full"] }
 actix-web = "4"
+actix-rt = "2"
+awc = { version = "3", features = ["rustls"]  }
 derive_more = "0.99.17"
-futures = "0.3.26"
+futures = { version = "0.3.26", default-features = false, features = ["alloc"] }
+futures-util = { version = "0.3.26", default-features = false, features = ["alloc", "sink"] }
+bytes = "1"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+env_logger = "0.9"

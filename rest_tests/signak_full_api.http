@@ -1,0 +1,4 @@
+GET http://localhost:3001/signalk/v1/api/
+Accept: application/json
+
+###
