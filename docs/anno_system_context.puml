@@ -1,0 +1,69 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+title System Context for navigation win Signal K RServer on Anno III
+SHOW_PERSON_OUTLINE()
+
+System_Ext(gWind, "gWind Wired transducer")
+System_Ext(gst_43, "GST™ 43 speed and temperature transducer")
+System_Ext(gdt_43, "GDT™ 43 depth transducer")
+System_Ext(gst_10, "GST™ 10")
+System_Ext(gnd_10, "GND™ 10")
+
+System_Ext(gnx_wind, "GNX™ Wind")
+System_Ext(gnx_20, "GNX™ 20 marine instrument")
+
+System_Ext(bng_v60b, "B&G V60-B VHF/AIS")
+
+SystemQueue_Ext(nmea2000, "NMEA 2000 Backbone")
+Rel(gWind, gnd_10, "sends wind data to", "gnd10")
+Rel(gnd_10, nmea2000, "sends wind data to", "NMEA 2000")
+Rel(gst_43, gst_10, "speed and temperature to", "gnd10")
+Rel(gst_10, nmea2000, "speed and temperature to", "NMEA 2000")
+Rel(gdt_43, nmea2000, "sends depth data", "NMEA 2000")
+Rel(bng_v60b, nmea2000, "Sends ship data", "NMEA 2000")
+
+Rel(nmea2000, gnx_wind, "Send Wind Information", "NMEA 2000")
+Rel(nmea2000, gnx_20, "Send Boat Information", "NMEA 2000")
+
+System_Ext(garmin_128, "Garmin GPS-128")
+System_Ext(gps_puck, "USB GPS Puck")
+System_Ext(st1000, "ST1000 Autopilot")
+
+System_Ext(signalk_gateway, "Signal K Gateway")
+System_Ext(open_cpn_pi, "Open CPN Embedded")
+
+Rel(nmea2000, signalk_gateway, "Send Boat Information", "NMEA 2000")
+Rel(signalk_gateway, nmea2000, "Send Boat Position", "NMEA 2000")
+Rel(garmin_128, signalk_gateway, "Send Boat position", "NMEA 0183")
+Rel(gps_puck, signalk_gateway, "Send backup position", "NMEA 0183")
+Rel(st1000, signalk_gateway, "Send Navigation Info", "NMEA 0183")
+Rel(signalk_gateway, st1000, "Send planned Course", "NMEA 0183")
+Rel(signalk_gateway, open_cpn_pi, "Send Navigation Data", "Signal K")
+
+System(signalk_rserver, "Signal K RServer")
+
+System_Ext(ipad, "iPad Navigator")
+System_Ext(iphone, "iPhone Navigator")
+System_Ext(cloud, "Cloud")
+System_Ext(open_cpn_laptop, "Open CPN Laptop")
+
+
+Rel(signalk_gateway, signalk_rserver, "Send Boat Data", "Signal K")
+Rel(signalk_rserver, cloud, "Sends updates to", "Signal K")
+Rel(signalk_rserver, ipad, "Send Navigation Data", "Signal K")
+Rel(signalk_rserver, iphone, "Send Navigation Data", "Signal K")
+Rel(signalk_rserver, open_cpn_laptop, "Send Navigation Data", "Signal K")
+
+Person_Ext(navigator, "Navigator")
+Person_Ext(helmsman, "Helmsman")
+
+Rel_U(helmsman, ipad, "Read Sea-charts")
+Rel_U(helmsman, iphone, "Back-up navigation")
+Rel_U(helmsman, gnx_wind, "Read Wind Angels")
+Rel_U(helmsman, gnx_20, "Read Depth and speed")
+
+Rel_U(navigator, open_cpn_pi, "Read Sea-charts")
+Rel_U(navigator, open_cpn_laptop, "Read Sea-charts")
+Rel_U(navigator, bng_v60b, "Operate Radio")
+
+@enduml

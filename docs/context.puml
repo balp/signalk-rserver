@@ -1,5 +1,17 @@
 @startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 
+title System Context for the Signal K RServer
+
+System_Ext(signalk_gateway, "Signal K Gateway")
+System(signalk_rserver, "Signal K RServer")
+
+System_Ext(mobile_device, "Mobile Device")
+System_Ext(cloud, "Cloud")
+
+
+Rel(signalk_rserver, signalk_gateway, "Gets updates from")
+Rel(signalk_rserver, cloud, "Sends updates to")
+Rel(mobile_device, signalk_rserver, "Gets navigation data from")
 
 @enduml
