@@ -94,6 +94,61 @@ fn make_structure_for_full_doc_example() {
     assert_eq!(navigation.position.unwrap_ref().sentence.unwrap_ref(), "RMC");
 
     assert!(sk_data.sources.unwrap_ref().contains_key("ttyUSB0".into()));
+    let usb_source = sk_data.sources.unwrap_ref().get("ttyUSB0".into()).unwrap();
+    assert_eq!(usb_source.label.unwrap_ref(), "ttyUSB0");
+    assert_eq!(usb_source.type_.unwrap_ref(), "NMEA0183");
+    let ii_source_property = usb_source.properties.get("II").unwrap();
+    assert_eq!(ii_source_property.talker.unwrap_ref(), "II");
+    assert_eq!(ii_source_property.sentences.unwrap_ref().get("HDM").unwrap(), "2017-05-16T05:15:54.006Z");
+    let gp_source_property = usb_source.properties.get("GP").unwrap();
+    assert_eq!(gp_source_property.talker.unwrap_ref(), "GP");
+    assert_eq!(gp_source_property.sentences.unwrap_ref().get("RMC").unwrap(), "2017-04-03T06:14:04.451Z");
+
+
+}
+#[test]
+fn make_structure_0183_rmc_export() {
+    let data = r#"
+    { "self":"urn:mrn:imo:mmsi:366982330",
+      "vessels": {
+        "urn:mrn:imo:mmsi:366982330": {
+          "mmsi": "366982330",
+          "navigation": {
+            "position": {
+              "timestamp": "2015-03-06T16:57:53.643Z",
+              "value": {
+                "longitude": 173.1693,
+                "latitude": -41.156426
+              },
+              "$source": "sources.gps_0183_RMC"
+            },
+            "courseOverGroundTrue": {
+              "timestamp": "2015-03-06T16:57:53.643Z",
+              "$source": "sources.gps_0183_RMC",
+              "value": 245.69
+            }
+          }
+        }
+      },
+      "version": "1.0.0"
+    }
+    "#;
+    let sample_vessel_id = "urn:mrn:imo:mmsi:366982330";
+
+    let sk_data: V1RootFormat = serde_json::from_str(data).unwrap();
+    assert_eq!(sk_data.version, "1.0.0");
+    assert_eq!(sk_data.self_, sample_vessel_id);
+    assert!(sk_data.vessels.unwrap_ref().contains_key(sample_vessel_id));
+    let sk_vessel = sk_data.vessels.unwrap_ref().get(sample_vessel_id).unwrap();
+    assert_eq!(sk_vessel.mmsi, Some("366982330".into()));
+    let navigation = sk_vessel.navigation.unwrap_ref();
+
+    assert_eq!(navigation.position.unwrap_ref().value.latitude, -41.156426);
+    assert_eq!(navigation.position.unwrap_ref().value.longitude, 173.1693);
+    assert_eq!(navigation.position.unwrap_ref().value.altitude, None);
+    assert_eq!(navigation.position.unwrap_ref().timestamp, "2015-03-06T16:57:53.643Z");
+    assert_eq!(navigation.position.unwrap_ref().source, "sources.gps_0183_RMC");
+
 
 
 }

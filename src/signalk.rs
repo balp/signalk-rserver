@@ -14,6 +14,7 @@ pub struct V1RootFormat {
 #[derive(Serialize, Deserialize)]
 pub struct V1Vessel {
     pub uuid: Option<String>,
+    pub mmsi: Option<String>,
     pub name: Option<String>,
     pub navigation: Option<V1Navigation>
 }
@@ -58,5 +59,14 @@ pub struct V1Source {
     pub label: Option<String>,
     #[serde(rename = "type")]
     pub type_: Option<String>,
+    #[serde(flatten)]
+    pub properties: HashMap<String, V1SourceProperty>,
+}
 
+#[derive(Serialize, Deserialize)]
+pub struct V1SourceProperty {
+    // pub ais: V1SourceAIS,
+    // pub n2k: V1SourceN2K,
+    pub talker: Option<String>,
+    pub sentences: Option<HashMap<String, String>>,
 }
