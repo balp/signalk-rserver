@@ -1,26 +1,14 @@
 use actix_web::{
-    get, web, App, HttpServer,
-    body::BoxBody, http::header::ContentType, HttpRequest, HttpResponse, Responder, Result,
+    App, body::BoxBody, get, http::header::ContentType,
+    HttpRequest, HttpResponse, HttpServer, Responder, Result, web,
 };
 use serde::Serialize;
 use serde_json::json;
+mod signalk;
 
-
-#[derive(Serialize)]
-struct V1VesselFormat {
-    mmsi: String,
-}
-
-#[derive(Serialize)]
-struct V1RootFormat {
-    version: String,
-    #[serde(rename = "self")]
-    self_: String,
-    vessels: V1VesselFormat
-}
 
 #[get("/signalk/v1/api/")]
-async fn signalk_v1(data: web::Data<V1RootFormat>) -> Result<impl Responder> {
+async fn signalk_v1(data: web::Data<signalk::V1RootFormat>) -> Result<impl Responder> {
     Ok(web::Json(data))
 }
 
@@ -48,10 +36,12 @@ async fn main() -> std::io::Result<()> {
     let self_link = format!("vessels.urn:mrn:signalk:uuid:{self_uuid}");
     HttpServer::new(|| {
         App::new()
-            .app_data(web::Data::new(V1RootFormat {
-                vessels: V1VesselFormat{ mmsi: "826512345".to_string()},
+            .app_data(web::Data::new(signalk::V1RootFormat {
+                // vessels: signalk::V1VesselFormat{ mmsi: "826512345".to_string()},
                 version: "1.7.0".to_string(),
                 self_: "vessels.urn:mrn:signalk:uuid:d6d08b72-88e2-4911-9429-ede4d5819549".to_string(),
+                vessels: None,
+                sources: None,
             }))
             .service(signalk_discovery)
             .service(signalk_v1)
