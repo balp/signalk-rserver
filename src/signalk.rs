@@ -7,7 +7,7 @@ pub struct V1RootFormat {
     #[serde(rename = "self")]
     pub self_: String,
     pub vessels: Option<HashMap<String, V1Vessel>>,
-    pub sources: Option<HashMap<String, V1Source>>,
+    pub sources: Option<V1Sources>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -55,6 +55,13 @@ pub struct V1PositionValue {
 }
 
 #[derive(Serialize, Deserialize)]
+pub struct V1Sources {
+    #[serde(rename = "_attr")]
+    pub type_: Option<V1Attr>,
+    #[serde(flatten)]
+    pub fields: Option<HashMap<String, V1Source>>,
+}
+#[derive(Serialize, Deserialize)]
 pub struct V1Source {
     pub label: Option<String>,
     #[serde(rename = "type")]
@@ -69,4 +76,14 @@ pub struct V1SourceProperty {
     // pub n2k: V1SourceN2K,
     pub talker: Option<String>,
     pub sentences: Option<HashMap<String, String>>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct V1Attr {
+    #[serde(rename = "_mode")]
+    pub mode: Option<i64>,
+    #[serde(rename = "_owner")]
+    pub owner: Option<String>,
+    #[serde(rename = "_group")]
+    pub group: Option<String>,
 }
