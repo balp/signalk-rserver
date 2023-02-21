@@ -2,18 +2,16 @@
 
 // use std::io::Bytes;
 use actix_rt::System;
-use awc::{Client, ws};
-use awc::ws::{Frame, Message};
 use awc::error::WsProtocolError;
-use futures_util::{sink::SinkExt, stream::StreamExt};
-use std::str;
-use serde::Deserialize;
-use serde_json::{Value, json};
+use awc::ws::{Frame, Message};
+use awc::{ws, Client};
 use bytes::{Bytes, BytesMut};
+use futures_util::{sink::SinkExt, stream::StreamExt};
+use serde::Deserialize;
+use serde_json::{json, Value};
+use std::str;
 
-
-#[derive(Debug)]
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 struct SignalKWSHello {
     name: String,
     version: String,
@@ -23,59 +21,47 @@ struct SignalKWSHello {
     timestamp: String,
 }
 
-
-#[derive(Debug)]
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 struct SignalKValueUUID {
     uuid: String,
 }
 
-#[derive(Debug)]
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 struct SignalKValuePosition {
     longitude: f32,
     latitude: f32,
 }
 
-
-
-#[derive(Debug)]
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 #[serde(untagged)]
 enum SignalKValue {
     UUID(SignalKValueUUID),
     Position(SignalKValuePosition),
 }
 
-#[derive(Debug)]
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 struct SignalKWSUpdateValue {
     path: String,
     value: SignalKValue,
 }
 
-#[derive(Debug)]
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 struct SignalKWSUpdateValueGroup {
     #[serde(rename = "$source")]
     d_source: String,
     #[serde(skip)]
     source: String,
     timestamp: String,
-    values: Vec<SignalKWSUpdateValue>
+    values: Vec<SignalKWSUpdateValue>,
 }
 
-
-#[derive(Debug)]
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 struct SignalKWSDelta {
     context: String,
-    updates: Vec<SignalKWSUpdateValueGroup>
+    updates: Vec<SignalKWSUpdateValueGroup>,
 }
 
-
-#[derive(Debug)]
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 #[serde(untagged)]
 enum SignalKWSMessage {
     Hello(SignalKWSHello),
@@ -94,11 +80,13 @@ struct SignalKUpdater {
 }
 impl Default for SignalKUpdater {
     fn default() -> Self {
-        SignalKUpdater { state: SignalKWSState::Disconnected, }
+        SignalKUpdater {
+            state: SignalKWSState::Disconnected,
+        }
     }
 }
 impl SignalKUpdater {
-  pub fn handle_ws_frame(&mut self, result: Result<Frame, WsProtocolError>) {
+    pub fn handle_ws_frame(&mut self, result: Result<Frame, WsProtocolError>) {
         println!("handle_ws_frame {:?}", result);
         let response = result.unwrap();
         match response {
@@ -131,7 +119,6 @@ impl SignalKUpdater {
     }
 }
 
-
 #[actix_rt::main]
 async fn main() {
     let mut sk_handler = SignalKUpdater::default();
@@ -141,11 +128,9 @@ async fn main() {
         .await
         .unwrap();
 
-
-    for _ in 0..10{
+    for _ in 0..10 {
         let option = connection.next().await;
         let res_1 = option.unwrap();
         sk_handler.handle_ws_frame(res_1);
     }
 }
-

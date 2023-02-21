@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize)]
 pub struct V1RootFormat {
@@ -7,16 +7,15 @@ pub struct V1RootFormat {
     #[serde(rename = "self")]
     pub self_: String,
     pub vessels: Option<HashMap<String, V1Vessel>>,
-    pub sources: Option<HashMap<String, V1Source>>
+    pub sources: Option<HashMap<String, V1Source>>,
 }
-
 
 #[derive(Serialize, Deserialize)]
 pub struct V1Vessel {
     pub uuid: Option<String>,
     pub mmsi: Option<String>,
     pub name: Option<String>,
-    pub navigation: Option<V1Navigation>
+    pub navigation: Option<V1Navigation>,
 }
 
 #[derive(Serialize, Deserialize)]

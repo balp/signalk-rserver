@@ -1,11 +1,10 @@
 use actix_web::{
-    App, body::BoxBody, get, http::header::ContentType,
-    HttpRequest, HttpResponse, HttpServer, Responder, Result, web,
+    body::BoxBody, get, http::header::ContentType, web, App, HttpRequest, HttpResponse, HttpServer,
+    Responder, Result,
 };
 use serde::Serialize;
 use serde_json::json;
 mod signalk;
-
 
 #[get("/signalk/v1/api/")]
 async fn signalk_v1(data: web::Data<signalk::V1RootFormat>) -> Result<impl Responder> {
@@ -29,7 +28,6 @@ async fn signalk_discovery() -> impl Responder {
     HttpResponse::Ok().body(body.to_string())
 }
 
-
 #[actix_web::main] // or #[tokio::main]
 async fn main() -> std::io::Result<()> {
     let self_uuid = "";
@@ -39,7 +37,8 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(signalk::V1RootFormat {
                 // vessels: signalk::V1VesselFormat{ mmsi: "826512345".to_string()},
                 version: "1.7.0".to_string(),
-                self_: "vessels.urn:mrn:signalk:uuid:d6d08b72-88e2-4911-9429-ede4d5819549".to_string(),
+                self_: "vessels.urn:mrn:signalk:uuid:d6d08b72-88e2-4911-9429-ede4d5819549"
+                    .to_string(),
                 vessels: None,
                 sources: None,
             }))

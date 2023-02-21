@@ -4,11 +4,12 @@ trait OptionExt {
     type Value;
     fn unwrap_ref(&self) -> &Self::Value;
 }
-impl <T> OptionExt for Option<T> {
+impl<T> OptionExt for Option<T> {
     type Value = T;
-    fn unwrap_ref(&self) -> &T { self.as_ref().unwrap() }
+    fn unwrap_ref(&self) -> &T {
+        self.as_ref().unwrap()
+    }
 }
-
 
 #[test]
 fn make_structure_for_full_doc_example() {
@@ -77,21 +78,59 @@ fn make_structure_for_full_doc_example() {
     assert_eq!(sk_vessel.name, Some("Motu".into()));
     let navigation = sk_vessel.navigation.unwrap_ref();
     assert_eq!(navigation.speed_over_ground.unwrap_ref().value, 4.32693662);
-    assert_eq!(navigation.speed_over_ground.unwrap_ref().timestamp, "2017-05-16T05:15:50.007Z");
-    assert_eq!(navigation.speed_over_ground.unwrap_ref().source, "ttyUSB0.GP");
-    assert_eq!(navigation.speed_over_ground.unwrap_ref().sentence.unwrap_ref(), "RMC");
+    assert_eq!(
+        navigation.speed_over_ground.unwrap_ref().timestamp,
+        "2017-05-16T05:15:50.007Z"
+    );
+    assert_eq!(
+        navigation.speed_over_ground.unwrap_ref().source,
+        "ttyUSB0.GP"
+    );
+    assert_eq!(
+        navigation
+            .speed_over_ground
+            .unwrap_ref()
+            .sentence
+            .unwrap_ref(),
+        "RMC"
+    );
 
     assert_eq!(navigation.heading_magnetic.unwrap_ref().value, 5.55014702);
-    assert_eq!(navigation.heading_magnetic.unwrap_ref().timestamp, "2017-05-16T05:15:54.006Z");
-    assert_eq!(navigation.heading_magnetic.unwrap_ref().source, "ttyUSB0.II");
-    assert_eq!(navigation.heading_magnetic.unwrap_ref().sentence.unwrap_ref(), "HDM");
+    assert_eq!(
+        navigation.heading_magnetic.unwrap_ref().timestamp,
+        "2017-05-16T05:15:54.006Z"
+    );
+    assert_eq!(
+        navigation.heading_magnetic.unwrap_ref().source,
+        "ttyUSB0.II"
+    );
+    assert_eq!(
+        navigation
+            .heading_magnetic
+            .unwrap_ref()
+            .sentence
+            .unwrap_ref(),
+        "HDM"
+    );
 
     assert_eq!(navigation.position.unwrap_ref().value.latitude, 37.81479);
-    assert_eq!(navigation.position.unwrap_ref().value.longitude, -122.44880152);
-    assert_eq!(navigation.position.unwrap_ref().value.altitude.unwrap(), 0.0);
-    assert_eq!(navigation.position.unwrap_ref().timestamp, "2017-05-16T05:15:50.007Z");
+    assert_eq!(
+        navigation.position.unwrap_ref().value.longitude,
+        -122.44880152
+    );
+    assert_eq!(
+        navigation.position.unwrap_ref().value.altitude.unwrap(),
+        0.0
+    );
+    assert_eq!(
+        navigation.position.unwrap_ref().timestamp,
+        "2017-05-16T05:15:50.007Z"
+    );
     assert_eq!(navigation.position.unwrap_ref().source, "ttyUSB0.GP");
-    assert_eq!(navigation.position.unwrap_ref().sentence.unwrap_ref(), "RMC");
+    assert_eq!(
+        navigation.position.unwrap_ref().sentence.unwrap_ref(),
+        "RMC"
+    );
 
     assert!(sk_data.sources.unwrap_ref().contains_key("ttyUSB0".into()));
     let usb_source = sk_data.sources.unwrap_ref().get("ttyUSB0".into()).unwrap();
@@ -99,12 +138,24 @@ fn make_structure_for_full_doc_example() {
     assert_eq!(usb_source.type_.unwrap_ref(), "NMEA0183");
     let ii_source_property = usb_source.properties.get("II").unwrap();
     assert_eq!(ii_source_property.talker.unwrap_ref(), "II");
-    assert_eq!(ii_source_property.sentences.unwrap_ref().get("HDM").unwrap(), "2017-05-16T05:15:54.006Z");
+    assert_eq!(
+        ii_source_property
+            .sentences
+            .unwrap_ref()
+            .get("HDM")
+            .unwrap(),
+        "2017-05-16T05:15:54.006Z"
+    );
     let gp_source_property = usb_source.properties.get("GP").unwrap();
     assert_eq!(gp_source_property.talker.unwrap_ref(), "GP");
-    assert_eq!(gp_source_property.sentences.unwrap_ref().get("RMC").unwrap(), "2017-04-03T06:14:04.451Z");
-
-
+    assert_eq!(
+        gp_source_property
+            .sentences
+            .unwrap_ref()
+            .get("RMC")
+            .unwrap(),
+        "2017-04-03T06:14:04.451Z"
+    );
 }
 #[test]
 fn make_structure_0183_rmc_export() {
@@ -146,9 +197,12 @@ fn make_structure_0183_rmc_export() {
     assert_eq!(navigation.position.unwrap_ref().value.latitude, -41.156426);
     assert_eq!(navigation.position.unwrap_ref().value.longitude, 173.1693);
     assert_eq!(navigation.position.unwrap_ref().value.altitude, None);
-    assert_eq!(navigation.position.unwrap_ref().timestamp, "2015-03-06T16:57:53.643Z");
-    assert_eq!(navigation.position.unwrap_ref().source, "sources.gps_0183_RMC");
-
-
-
+    assert_eq!(
+        navigation.position.unwrap_ref().timestamp,
+        "2015-03-06T16:57:53.643Z"
+    );
+    assert_eq!(
+        navigation.position.unwrap_ref().source,
+        "sources.gps_0183_RMC"
+    );
 }
