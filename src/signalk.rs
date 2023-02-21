@@ -22,6 +22,7 @@ pub struct V1Vessel {
 #[serde(rename_all = "camelCase")]
 pub struct V1Navigation {
     pub speed_over_ground: Option<V1NumberValue>,
+    pub course_over_ground_true: Option<V1NumberValue>,
     pub heading_magnetic: Option<V1NumberValue>,
     pub position: Option<V1PositionType>,
 }

@@ -1,3 +1,5 @@
+use std::fs::File;
+use std::io::BufReader;
 use signalk_rserver::signalk::V1RootFormat;
 
 trait OptionExt {
@@ -205,4 +207,37 @@ fn make_structure_0183_rmc_export() {
         navigation.position.unwrap_ref().source,
         "sources.gps_0183_RMC"
     );
+}
+
+#[test]
+fn test_sample_full_0183_rmc_export() {
+    let file = File::open("tests/specification/examples/full/0183-RMC-export.json").unwrap();
+    let reader = BufReader::new(file);
+    let sk_data: V1RootFormat = serde_json::from_reader(reader).unwrap();
+    let sample_vessel_id = "urn:mrn:imo:mmsi:366982330";
+    assert_eq!(sk_data.self_, sample_vessel_id);
+    let sk_vessel = sk_data.vessels.unwrap_ref().get(sample_vessel_id).unwrap();
+    let navigation = sk_vessel.navigation.unwrap_ref();
+
+    assert_eq!(navigation.position.unwrap_ref().value.latitude, -41.156426);
+    assert_eq!(navigation.position.unwrap_ref().value.longitude, 173.1693);
+    assert_eq!(navigation.position.unwrap_ref().value.altitude, None);
+    assert_eq!(navigation.course_over_ground_true.unwrap_ref().value, 245.69);
+}
+
+#[test]
+fn test_sample_full_0183_rmc_export_min() {
+    let file = File::open("tests/specification/examples/full/0183-RMC-export-min.json").unwrap();
+    let reader = BufReader::new(file);
+    let sk_data: V1RootFormat = serde_json::from_reader(reader).unwrap();
+    let sample_vessel_id = "urn:mrn:imo:mmsi:366982330";
+    assert_eq!(sk_data.self_, sample_vessel_id);
+    let sk_vessel = sk_data.vessels.unwrap_ref().get(sample_vessel_id).unwrap();
+    let navigation = sk_vessel.navigation.unwrap_ref();
+
+    assert_eq!(navigation.position.unwrap_ref().value.latitude, -41.156426);
+    assert_eq!(navigation.position.unwrap_ref().value.longitude, 173.1693);
+    assert_eq!(navigation.position.unwrap_ref().value.altitude, Some(0.0));
+    assert_eq!(navigation.course_over_ground_true.unwrap_ref().value, 245.69);
+
 }
