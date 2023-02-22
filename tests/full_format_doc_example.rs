@@ -1,11 +1,14 @@
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
-use signalk_rserver::signalk::V1RootFormat;
+
+use signalk_rserver::signalk::{V1Attr, V1Navigation, V1NumberValue, V1PositionType, V1PositionValue, V1RootFormat, V1Sources, V1Vessel};
 
 trait OptionExt {
     type Value;
     fn unwrap_ref(&self) -> &Self::Value;
 }
+
 impl<T> OptionExt for Option<T> {
     type Value = T;
     fn unwrap_ref(&self) -> &T {
@@ -135,8 +138,8 @@ fn make_structure_for_full_doc_example() {
     );
 
     let sources = sk_data.sources.unwrap_ref();
-    assert!(sources.fields.unwrap_ref().contains_key("ttyUSB0".into()));
-    let usb_source = sources.fields.unwrap_ref().get("ttyUSB0".into()).unwrap();
+    assert!(sources.fields.contains_key("ttyUSB0".into()));
+    let usb_source = sources.fields.get("ttyUSB0".into()).unwrap();
     assert_eq!(usb_source.label.unwrap_ref(), "ttyUSB0");
     assert_eq!(usb_source.type_.unwrap_ref(), "NMEA0183");
     let ii_source_property = usb_source.properties.get("II").unwrap();
@@ -161,52 +164,190 @@ fn make_structure_for_full_doc_example() {
     );
 }
 
-#[test]
-fn test_sample_full_0183_rmc_export() {
-    let file = File::open("tests/specification/examples/full/0183-RMC-export.json").unwrap();
+fn read_signalk_from_file(path: &str) -> V1RootFormat {
+    let file = File::open(path).unwrap();
     let reader = BufReader::new(file);
     let sk_data: V1RootFormat = serde_json::from_reader(reader).unwrap();
-    let sample_vessel_id = "urn:mrn:imo:mmsi:366982330";
-    assert_eq!(sk_data.self_, sample_vessel_id);
-    let sk_vessel = sk_data.vessels.unwrap_ref().get(sample_vessel_id).unwrap();
-    let navigation = sk_vessel.navigation.unwrap_ref();
+    sk_data
+}
 
-    assert_eq!(navigation.position.unwrap_ref().value.latitude, -41.156426);
-    assert_eq!(navigation.position.unwrap_ref().value.longitude, 173.1693);
-    assert_eq!(navigation.position.unwrap_ref().value.altitude, None);
-    assert_eq!(navigation.course_over_ground_true.unwrap_ref().value, 245.69);
+#[test]
+fn test_sample_full_0183_rmc_export() {
+    let expected = V1RootFormat {
+        version: "1.0.0".into(),
+        self_: "urn:mrn:imo:mmsi:366982330".into(),
+        vessels: Some(HashMap::from([(
+            "urn:mrn:imo:mmsi:366982330".into(),
+            V1Vessel {
+                uuid: None,
+                mmsi: Some("366982330".into()),
+                name: None,
+                navigation: Some(V1Navigation {
+                    speed_over_ground: None,
+                    course_over_ground_true: Some(V1NumberValue {
+                        value: 245.69,
+                        timestamp: "2015-03-06T16:57:53.643Z".into(),
+                        source: "sources.gps_0183_RMC".into(),
+                        pgn: None,
+                        sentence: None,
+                    }),
+                    heading_magnetic: None,
+                    position: Some(V1PositionType {
+                        value: V1PositionValue {
+                            latitude: -41.156426,
+                            longitude: 173.1693,
+                            altitude: None,
+                        },
+                        timestamp: "2015-03-06T16:57:53.643Z".into(),
+                        source: "sources.gps_0183_RMC".into(),
+                        pgn: None,
+                        sentence: None,
+                    }),
+                }),
+            },
+        )])),
+        sources: None,
+    };
+
+    let sk_data = read_signalk_from_file("tests/specification/examples/full/0183-RMC-export.json");
+
+    assert_eq!(sk_data, expected);
+}
+
+#[test]
+fn test_sample_docs_full_example() {
+    let expected = V1RootFormat {
+        version: "1.0.0".into(),
+        self_: "urn:mrn:signalk:uuid:705f5f1a-efaf-44aa-9cb8-a0fd6305567c".into(),
+        vessels: Some(HashMap::from([(
+            "urn:mrn:signalk:uuid:705f5f1a-efaf-44aa-9cb8-a0fd6305567c".into(),
+            V1Vessel {
+                uuid: Some("urn:mrn:signalk:uuid:705f5f1a-efaf-44aa-9cb8-a0fd6305567c".into()),
+                mmsi: None,
+                name: Some("Motu".into()),
+                navigation: Some(V1Navigation {
+                    speed_over_ground: Some(V1NumberValue {
+                        value: 4.32693662,
+                        timestamp: "2017-05-16T05:15:50.007Z".into(),
+                        source: "ttyUSB0.GP".into(),
+                        pgn: None,
+                        sentence: Some("RMC".into()) }),
+                    course_over_ground_true: None,
+                    heading_magnetic: Some(V1NumberValue {
+                        value: 5.55014702,
+                        timestamp: "2017-05-16T05:15:54.006Z".into(),
+                        source: "ttyUSB0.II".into(),
+                        pgn: None,
+                        sentence: Some("HDM".into())
+                    }),
+                    position: Some(V1PositionType {
+                        value: V1PositionValue {
+                            latitude: -41.156426,
+                            longitude: 173.1693,
+                            altitude: None,
+                        },
+                        timestamp: "2015-03-06T16:57:53.643Z".into(),
+                        source: "sources.gps_0183_RMC".into(),
+                        pgn: None,
+                        sentence: None,
+                    }),
+                }),
+            },
+        )])),
+        sources: None,
+    };
+
+    let sk_data = read_signalk_from_file("tests/specification/examples/full/docs-full-example.json");
+
+    assert_eq!(sk_data, expected);
 }
 
 #[test]
 fn test_sample_full_0183_rmc_export_min() {
-    let file = File::open("tests/specification/examples/full/0183-RMC-export-min.json").unwrap();
-    let reader = BufReader::new(file);
-    let sk_data: V1RootFormat = serde_json::from_reader(reader).unwrap();
-    let sample_vessel_id = "urn:mrn:imo:mmsi:366982330";
-    assert_eq!(sk_data.self_, sample_vessel_id);
-    let sk_vessel = sk_data.vessels.unwrap_ref().get(sample_vessel_id).unwrap();
-    let navigation = sk_vessel.navigation.unwrap_ref();
+    let expected = V1RootFormat {
+        version: "1.0.0".into(),
+        self_: "urn:mrn:imo:mmsi:366982330".into(),
+        vessels: Some(HashMap::from([(
+            "urn:mrn:imo:mmsi:366982330".into(),
+            V1Vessel {
+                uuid: None,
+                mmsi: Some("230099999".into()),
+                name: None,
+                navigation: Some(V1Navigation {
+                    speed_over_ground: None,
+                    course_over_ground_true: Some(V1NumberValue {
+                        value: 245.69,
+                        timestamp: "2015-01-25T12:01:01Z".into(),
+                        source: "a.suitable.path".into(),
+                        pgn: None,
+                        sentence: None,
+                    }),
+                    heading_magnetic: None,
+                    position: Some(V1PositionType {
+                        value: V1PositionValue {
+                            latitude: -41.156426,
+                            longitude: 173.1693,
+                            altitude: Some(0.0),
+                        },
+                        timestamp: "2015-01-25T12:01:01Z".into(),
+                        source: "a.suitable.path".into(),
+                        pgn: None,
+                        sentence: None,
+                    }),
+                }),
+            },
+        )])),
+        sources: None,
+    };
 
-    assert_eq!(navigation.position.unwrap_ref().value.latitude, -41.156426);
-    assert_eq!(navigation.position.unwrap_ref().value.longitude, 173.1693);
-    assert_eq!(navigation.position.unwrap_ref().value.altitude, Some(0.0));
-    assert_eq!(navigation.course_over_ground_true.unwrap_ref().value, 245.69);
+    let sk_data =
+        read_signalk_from_file("tests/specification/examples/full/0183-RMC-export-min.json");
 
+    assert_eq!(sk_data, expected);
 }
 
 #[test]
 fn test_sample_full_0183_rmc_full() {
-    let file = File::open("tests/specification/examples/full/0183-RMC-full.json").unwrap();
-    let reader = BufReader::new(file);
-    let sk_data: V1RootFormat = serde_json::from_reader(reader).unwrap();
-    let sample_vessel_id = "urn:mrn:imo:mmsi:366982330";
-    assert_eq!(sk_data.self_, sample_vessel_id);
-    let sk_vessel = sk_data.vessels.unwrap_ref().get(sample_vessel_id).unwrap();
-    let navigation = sk_vessel.navigation.unwrap_ref();
-
-    assert_eq!(navigation.position.unwrap_ref().value.latitude, -41.156426);
-    assert_eq!(navigation.position.unwrap_ref().value.longitude, 173.1693);
-    assert_eq!(navigation.position.unwrap_ref().value.altitude, Some(0.0));
-    assert_eq!(navigation.course_over_ground_true.unwrap_ref().value, 245.69);
-
+    let expected = V1RootFormat {
+        version: "0.1.0".into(),
+        self_: "urn:mrn:imo:mmsi:366982330".into(),
+        vessels: Some(HashMap::from([(
+            "urn:mrn:imo:mmsi:366982330".into(),
+            V1Vessel {
+                uuid: None,
+                mmsi: Some("366982330".into()),
+                name: None,
+                navigation: Some(V1Navigation {
+                    speed_over_ground: None,
+                    course_over_ground_true: Some(V1NumberValue {
+                        value: 245.69,
+                        timestamp: "2015-03-06T16:57:53.643Z".into(),
+                        source: "sources.gps_0183_RMC".into(),
+                        pgn: None,
+                        sentence: None,
+                    }),
+                    heading_magnetic: None,
+                    position: Some(V1PositionType {
+                        value: V1PositionValue {
+                            latitude: -41.156426,
+                            longitude: 173.1693,
+                            altitude: Some(0.0),
+                        },
+                        timestamp: "2015-03-06T16:57:53.643Z".into(),
+                        source: "sources.gps_0183_RMC".into(),
+                        pgn: None,
+                        sentence: None,
+                    }),
+                }),
+            },
+        )])),
+        sources: Some(V1Sources {
+            type_: Some(V1Attr {
+                mode: Some(644),
+                owner: Some("self".into()),
+                group: Some("self".into())}),
+            fields: HashMap::from([]) }),
+    };
+    let sk_data = read_signalk_from_file("tests/specification/examples/full/0183-RMC-full.json");
+    assert_eq!(sk_data, expected);
 }
