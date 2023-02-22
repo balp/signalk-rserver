@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
 
-use signalk_rserver::signalk::{V1Attr, V1Navigation, V1NumberValue, V1PositionType, V1PositionValue, V1RootFormat, V1Sources, V1Vessel};
+use signalk_rserver::signalk::{V1Attr, V1Navigation, V1NumberValue, V1PositionType, V1PositionValue, V1RootFormat, V1Source, V1SourceProperty, V1Sources, V1Vessel};
 
 trait OptionExt {
     type Value;
@@ -242,19 +242,37 @@ fn test_sample_docs_full_example() {
                     }),
                     position: Some(V1PositionType {
                         value: V1PositionValue {
-                            latitude: -41.156426,
-                            longitude: 173.1693,
-                            altitude: None,
+                            latitude: 37.81479,
+                            longitude: -122.44880152,
+                            altitude: Some(0.0),
                         },
-                        timestamp: "2015-03-06T16:57:53.643Z".into(),
-                        source: "sources.gps_0183_RMC".into(),
+                        timestamp: "2017-05-16T05:15:50.007Z".into(),
+                        source: "ttyUSB0.GP".into(),
                         pgn: None,
-                        sentence: None,
+                        sentence: Some("RMC".into()),
                     }),
                 }),
             },
         )])),
-        sources: None,
+        sources: Some(V1Sources {
+            type_: None,
+            fields: HashMap::from([
+                ("ttyUSB0".into(), V1Source {
+                    label: Some("ttyUSB0".into()),
+                    type_: Some("NMEA0183".into()),
+                    properties: HashMap::from([
+                        ("II".into(), V1SourceProperty {
+                            talker: Some("II".into()),
+                            sentences: Some(HashMap::from([("HDM".into(), "2017-05-16T05:15:54.006Z".into())])),
+                            extras: Default::default()}),
+                        ("GP".into(), V1SourceProperty {
+                            talker: Some("GP".into()),
+                            sentences: Some(HashMap::from([("RMC".into(), "2017-04-03T06:14:04.451Z".into())])),
+                            extras: Default::default()}),
+                    ]),
+                }),
+            ]),
+        }),
     };
 
     let sk_data = read_signalk_from_file("tests/specification/examples/full/docs-full-example.json");
@@ -341,12 +359,7 @@ fn test_sample_full_0183_rmc_full() {
                 }),
             },
         )])),
-        sources: Some(V1Sources {
-            type_: Some(V1Attr {
-                mode: Some(644),
-                owner: Some("self".into()),
-                group: Some("self".into())}),
-            fields: HashMap::from([]) }),
+        sources: None,
     };
     let sk_data = read_signalk_from_file("tests/specification/examples/full/0183-RMC-full.json");
     assert_eq!(sk_data, expected);
