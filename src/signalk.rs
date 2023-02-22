@@ -16,8 +16,35 @@ pub struct V1Vessel {
     pub mmsi: Option<String>,
     pub name: Option<String>,
     pub navigation: Option<V1Navigation>,
+    pub propulsion: Option<HashMap<String, V1Propulsion>>,
 }
 
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct V1Propulsion {
+    pub label: String,
+    pub state: Option<V1PropulsionState>,
+    pub revolutions: Option<V1NumberValue>,
+    pub temperature: Option<V1NumberValue>,
+    pub oil_temperature: Option<V1NumberValue>,
+    pub oil_pressure: Option<V1NumberValue>,
+    pub alternator_voltage: Option<V1NumberValue>,
+    pub run_time: Option<V1NumberValue>,
+    pub coolant_temperature: Option<V1NumberValue>,
+    pub coolant_pressure: Option<V1NumberValue>,
+    pub boost_pressure: Option<V1NumberValue>,
+    pub intake_manifold_temperature: Option<V1NumberValue>,
+    pub engine_load: Option<V1NumberValue>,
+    pub engine_torque: Option<V1NumberValue>,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[serde(rename_all = "lowercase")]
+pub enum V1PropulsionState {
+    Stopped,
+    Started,
+    Unusable
+}
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct V1Navigation {
@@ -35,6 +62,7 @@ pub struct V1NumberValue {
     pub source: String,
     pub pgn: Option<f64>,
     pub sentence: Option<String>,
+    // TODO: Add support for meta values
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
