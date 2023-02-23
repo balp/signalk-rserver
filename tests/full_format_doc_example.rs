@@ -2,7 +2,10 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
 
-use signalk_rserver::signalk::{V1Attr, V1Navigation, V1NumberValue, V1PositionType, V1PositionValue, V1Propulsion, V1RootFormat, V1Source, V1SourceProperty, V1Sources, V1Vessel};
+use signalk_rserver::signalk::{
+    V1Attr, V1Navigation, V1NumberValue, V1PositionType, V1PositionValue, V1Propulsion,
+    V1RootFormat, V1Source, V1SourceProperty, V1Sources, V1Vessel,
+};
 
 trait OptionExt {
     type Value;
@@ -259,28 +262,42 @@ fn test_sample_docs_full_example() {
         )])),
         sources: Some(V1Sources {
             type_: None,
-            fields: HashMap::from([
-                ("ttyUSB0".into(), V1Source {
+            fields: HashMap::from([(
+                "ttyUSB0".into(),
+                V1Source {
                     label: Some("ttyUSB0".into()),
                     type_: Some("NMEA0183".into()),
                     properties: HashMap::from([
-                        ("II".into(), V1SourceProperty {
-                            talker: Some("II".into()),
-                            sentences: Some(HashMap::from([("HDM".into(), "2017-05-16T05:15:54.006Z".into())])),
-                            extras: Default::default(),
-                        }),
-                        ("GP".into(), V1SourceProperty {
-                            talker: Some("GP".into()),
-                            sentences: Some(HashMap::from([("RMC".into(), "2017-04-03T06:14:04.451Z".into())])),
-                            extras: Default::default(),
-                        }),
+                        (
+                            "II".into(),
+                            V1SourceProperty {
+                                talker: Some("II".into()),
+                                sentences: Some(HashMap::from([(
+                                    "HDM".into(),
+                                    "2017-05-16T05:15:54.006Z".into(),
+                                )])),
+                                extras: Default::default(),
+                            },
+                        ),
+                        (
+                            "GP".into(),
+                            V1SourceProperty {
+                                talker: Some("GP".into()),
+                                sentences: Some(HashMap::from([(
+                                    "RMC".into(),
+                                    "2017-04-03T06:14:04.451Z".into(),
+                                )])),
+                                extras: Default::default(),
+                            },
+                        ),
                     ]),
-                }),
-            ]),
+                },
+            )]),
         }),
     };
 
-    let sk_data = read_signalk_from_file("tests/specification/examples/full/docs-full-example.json");
+    let sk_data =
+        read_signalk_from_file("tests/specification/examples/full/docs-full-example.json");
 
     assert_eq!(sk_data, expected);
 }
@@ -374,7 +391,69 @@ fn test_sample_full_0183_rmc_full() {
 
 #[test]
 fn test_sample_docs_data_model() {
-    let expected = V1RootFormat {
+    let expected = V1RootFormat::builder()
+        .version("1.0.0".into())
+        .self_("urn:mrn:signalk:uuid:705f5f1a-efaf-44aa-9cb8-a0fd6305567c".into())
+        .add_vessel("urn:mrn:signalk:uuid:705f5f1a-efaf-44aa-9cb8-a0fd6305567c".into(),
+                    V1Vessel::builder()
+                        .uuid("urn:mrn:signalk:uuid:705f5f1a-efaf-44aa-9cb8-a0fd6305567c".into())
+                        .name("Motu".into())
+                        .navigation(V1Navigation::builder()
+                            .speed_over_ground(V1NumberValue::builder()
+                                .value(4.32693662)
+                                .timestamp("2017-05-16T05:15:50.007Z".into())
+                                .source("ttyUSB0.GP".into())
+                                .sentence("RMC".into())
+                                .build())
+                            .heading_magnetic(V1NumberValue::builder()
+                                .value(5.55014702)
+                                .timestamp("2017-05-16T05:15:54.006Z".into())
+                                .source("ttyUSB0.II".into())
+                                .sentence("HDM".into())
+                                .build())
+                            .position(V1PositionType::builder()
+                                .value(V1PositionValue::new_3d(37.81479, -122.44880152, 0.0))
+                                .timestamp("2017-05-16T05:15:50.007Z".into())
+                                .source("ttyUSB0.GP".into())
+                                .sentence("RMC".into())
+                                .build())
+                            .build()).build())
+        .sources(V1Sources {
+            type_: None,
+            fields: HashMap::from([(
+                "ttyUSB0".into(),
+                V1Source {
+                    label: Some("ttyUSB0".into()),
+                    type_: Some("NMEA0183".into()),
+                    properties: HashMap::from([
+                        (
+                            "II".into(),
+                            V1SourceProperty {
+                                talker: Some("II".into()),
+                                sentences: Some(HashMap::from([(
+                                    "HDM".into(),
+                                    "2017-05-16T05:15:54.006Z".into(),
+                                )])),
+                                extras: Default::default(),
+                            },
+                        ),
+                        (
+                            "GP".into(),
+                            V1SourceProperty {
+                                talker: Some("GP".into()),
+                                sentences: Some(HashMap::from([(
+                                    "RMC".into(),
+                                    "2017-04-03T06:14:04.451Z".into(),
+                                )])),
+                                extras: Default::default(),
+                            },
+                        ),
+                    ]),
+                },
+            )]),
+        })
+        .build();
+    let nexpected = V1RootFormat {
         version: "1.0.0".into(),
         self_: "urn:mrn:signalk:uuid:705f5f1a-efaf-44aa-9cb8-a0fd6305567c".into(),
         vessels: Some(HashMap::from([(
@@ -416,24 +495,37 @@ fn test_sample_docs_data_model() {
         )])),
         sources: Some(V1Sources {
             type_: None,
-            fields: HashMap::from([
-                ("ttyUSB0".into(), V1Source {
+            fields: HashMap::from([(
+                "ttyUSB0".into(),
+                V1Source {
                     label: Some("ttyUSB0".into()),
                     type_: Some("NMEA0183".into()),
                     properties: HashMap::from([
-                        ("II".into(), V1SourceProperty {
-                            talker: Some("II".into()),
-                            sentences: Some(HashMap::from([("HDM".into(), "2017-05-16T05:15:54.006Z".into())])),
-                            extras: Default::default(),
-                        }),
-                        ("GP".into(), V1SourceProperty {
-                            talker: Some("GP".into()),
-                            sentences: Some(HashMap::from([("RMC".into(), "2017-04-03T06:14:04.451Z".into())])),
-                            extras: Default::default(),
-                        }),
+                        (
+                            "II".into(),
+                            V1SourceProperty {
+                                talker: Some("II".into()),
+                                sentences: Some(HashMap::from([(
+                                    "HDM".into(),
+                                    "2017-05-16T05:15:54.006Z".into(),
+                                )])),
+                                extras: Default::default(),
+                            },
+                        ),
+                        (
+                            "GP".into(),
+                            V1SourceProperty {
+                                talker: Some("GP".into()),
+                                sentences: Some(HashMap::from([(
+                                    "RMC".into(),
+                                    "2017-04-03T06:14:04.451Z".into(),
+                                )])),
+                                extras: Default::default(),
+                            },
+                        ),
                     ]),
-                }),
-            ]),
+                },
+            )]),
         }),
     };
     let sk_data = read_signalk_from_file("tests/specification/examples/full/docs-data_model.json");
@@ -442,75 +534,63 @@ fn test_sample_docs_data_model() {
 
 #[test]
 fn test_sample_docs_data_model_metadata() {
-    let expected = V1RootFormat {
-        version: "1.0.0".into(),
-        self_: "urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into(),
-        vessels: Some(HashMap::from([(
-            "urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into(),
-            V1Vessel {
-                uuid: Some("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into()),
-                mmsi: None,
-                name: None,
-                navigation: None,
-                propulsion: Some(HashMap::from([(
-                    "instance0".into(), V1Propulsion {
-                        label: "Port Engine".into(),
-                        state: None,
-                        revolutions: Some(V1NumberValue {
-                            value: 1280.0,
-                            timestamp: "2014-08-15T19:00:15.402Z".into(),
-                            source: "foo.bar".into(),
-                            pgn: None,
-                            sentence: None }),
-                        temperature: None,
-                        oil_temperature: None,
-                        oil_pressure: None,
-                        alternator_voltage: None,
-                        run_time: None,
-                        coolant_temperature: None,
-                        coolant_pressure: None,
-                        boost_pressure: None,
-                        intake_manifold_temperature: None,
-                        engine_load: None,
-                        engine_torque: None,
-                    }
-                    )])),
-            }),
-        ])),
-        sources: None,
-    };
-    let sk_data = read_signalk_from_file("tests/specification/examples/full/docs-data_model_metadata.json");
+    let expected = V1RootFormat::builder()
+        .version("1.0.0".into())
+        .self_("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
+        .add_vessel("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into(),
+                    V1Vessel::builder()
+                        .uuid("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
+                        .add_propulsion("instance0".into(), V1Propulsion::builder()
+                            .label("Port Engine".into())
+                            .revolutions(V1NumberValue::builder()
+                                .value(1280.0)
+                                .timestamp("2014-08-15T19:00:15.402Z".into())
+                                .source("foo.bar".into())
+                                .build())
+                            .build())
+                        .build()).build();
+    let sk_data =
+        read_signalk_from_file("tests/specification/examples/full/docs-data_model_metadata.json");
     assert_eq!(sk_data, expected);
 }
 
 #[test]
 fn test_sample_docs_data_model_multiple_values_metadata() {
-    let expected = V1RootFormat {
-        version: "0.9.0".into(),
-        self_: "urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into(),
-        vessels: Some(HashMap::from([(
-            "urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into(),
-            V1Vessel {
-                uuid: Some("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into()),
-                mmsi: None,
-                name: None,
-                navigation: Some(V1Navigation {
-                    speed_over_ground: None,
-                    course_over_ground_true: Some(V1NumberValue {
-                        value: 3.61562407843144,
-                        timestamp: "2017-04-03T06:14:04.451Z".to_string(),
-                        source: "ttyUSB0.GP".to_string(),
-                        pgn: None,
-                        sentence: None,
-                    }),
-                    heading_magnetic: None,
-                    position: None,
-                }),
-                propulsion: None,
-            }),
-        ])),
-        sources: None,
-    };
-    let sk_data = read_signalk_from_file("tests/specification/examples/full/docs-data_model_multiple_values.json");
+    let expected = V1RootFormat::builder()
+        .version("0.9.0".into())
+        .self_("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
+        .add_vessel("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into(),
+                    V1Vessel::builder()
+                        .uuid("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
+                        .navigation(
+                            V1Navigation::builder()
+                                .course_over_ground_true(
+                                    V1NumberValue::builder()
+                                        .value(3.61562407843144)
+                                        .timestamp("2017-04-03T06:14:04.451Z".into())
+                                        .source("ttyUSB0.GP".into())
+                                        .build()
+                                ).build())
+                        .build(),
+        )
+        .build();
+    let sk_data = read_signalk_from_file(
+        "tests/specification/examples/full/docs-data_model_multiple_values.json",
+    );
+    assert_eq!(sk_data, expected);
+}
+
+#[test]
+fn test_sample_docs_notifications() {
+    let expected = V1RootFormat::builder()
+        .version("1.0.0".into())
+        .self_("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
+        .add_vessel("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into(),
+                    V1Vessel::builder()
+                        .uuid("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
+                        .build())
+        .build();
+    let sk_data =
+        read_signalk_from_file("tests/specification/examples/full/docs-notifications.json");
     assert_eq!(sk_data, expected);
 }
