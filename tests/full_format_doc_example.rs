@@ -55,47 +55,35 @@ fn test_sample_full_0183_rmc_export() {
 
 #[test]
 fn test_sample_docs_full_example() {
-    let expected = V1RootFormat {
-        version: "1.0.0".into(),
-        self_: "urn:mrn:signalk:uuid:705f5f1a-efaf-44aa-9cb8-a0fd6305567c".into(),
-        vessels: Some(HashMap::from([(
-            "urn:mrn:signalk:uuid:705f5f1a-efaf-44aa-9cb8-a0fd6305567c".into(),
-            V1Vessel {
-                uuid: Some("urn:mrn:signalk:uuid:705f5f1a-efaf-44aa-9cb8-a0fd6305567c".into()),
-                mmsi: None,
-                name: Some("Motu".into()),
-                navigation: Some(V1Navigation {
-                    speed_over_ground: Some(V1NumberValue {
-                        value: 4.32693662,
-                        timestamp: "2017-05-16T05:15:50.007Z".into(),
-                        source: "ttyUSB0.GP".into(),
-                        pgn: None,
-                        sentence: Some("RMC".into()),
-                    }),
-                    course_over_ground_true: None,
-                    heading_magnetic: Some(V1NumberValue {
-                        value: 5.55014702,
-                        timestamp: "2017-05-16T05:15:54.006Z".into(),
-                        source: "ttyUSB0.II".into(),
-                        pgn: None,
-                        sentence: Some("HDM".into()),
-                    }),
-                    position: Some(V1PositionType {
-                        value: V1PositionValue {
-                            latitude: 37.81479,
-                            longitude: -122.44880152,
-                            altitude: Some(0.0),
-                        },
-                        timestamp: "2017-05-16T05:15:50.007Z".into(),
-                        source: "ttyUSB0.GP".into(),
-                        pgn: None,
-                        sentence: Some("RMC".into()),
-                    }),
-                }),
-                propulsion: None,
-            },
-        )])),
-        sources: Some(V1Sources {
+    let expected = V1RootFormat::builder()
+        .version("1.0.0".into())
+        .self_("urn:mrn:signalk:uuid:705f5f1a-efaf-44aa-9cb8-a0fd6305567c".into())
+        .add_vessel("urn:mrn:signalk:uuid:705f5f1a-efaf-44aa-9cb8-a0fd6305567c".into(),
+                    V1Vessel::builder()
+                        .uuid("urn:mrn:signalk:uuid:705f5f1a-efaf-44aa-9cb8-a0fd6305567c".into())
+                        .name("Motu".into())
+                        .navigation(V1Navigation::builder()
+                            .speed_over_ground(V1NumberValue::builder()
+                                .value(4.32693662)
+                                .timestamp("2017-05-16T05:15:50.007Z".into())
+                                .source("ttyUSB0.GP".into())
+                                .sentence("RMC".into())
+                                .build())
+                            .heading_magnetic(V1NumberValue::builder()
+                                .value(5.55014702)
+                                .timestamp("2017-05-16T05:15:54.006Z".into())
+                                .source("ttyUSB0.II".into())
+                                .sentence("HDM".into())
+                                .build())
+                            .position(V1PositionType::builder()
+                                .value(V1PositionValue::new_3d(37.81479, -122.44880152, 0.0))
+                                .timestamp("2017-05-16T05:15:50.007Z".into())
+                                .source("ttyUSB0.GP".into())
+                                .sentence("RMC".into())
+                                .build())
+                            .build())
+                        .build())
+        .sources(V1Sources {
             type_: None,
             fields: HashMap::from([(
                 "ttyUSB0".into(),
@@ -128,9 +116,8 @@ fn test_sample_docs_full_example() {
                     ]),
                 },
             )]),
-        }),
-    };
-
+        })
+        .build();
     let sk_data =
         read_signalk_from_file("tests/specification/examples/full/docs-full-example.json");
 
