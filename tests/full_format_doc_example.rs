@@ -126,42 +126,27 @@ fn test_sample_docs_full_example() {
 
 #[test]
 fn test_sample_full_0183_rmc_export_min() {
-    let expected = V1RootFormat {
-        version: "1.0.0".into(),
-        self_: "urn:mrn:imo:mmsi:366982330".into(),
-        vessels: Some(HashMap::from([(
-            "urn:mrn:imo:mmsi:366982330".into(),
-            V1Vessel {
-                uuid: None,
-                mmsi: Some("230099999".into()),
-                name: None,
-                navigation: Some(V1Navigation {
-                    speed_over_ground: None,
-                    course_over_ground_true: Some(V1NumberValue {
-                        value: 245.69,
-                        timestamp: "2015-01-25T12:01:01Z".into(),
-                        source: "a.suitable.path".into(),
-                        pgn: None,
-                        sentence: None,
-                    }),
-                    heading_magnetic: None,
-                    position: Some(V1PositionType {
-                        value: V1PositionValue {
-                            latitude: -41.156426,
-                            longitude: 173.1693,
-                            altitude: Some(0.0),
-                        },
-                        timestamp: "2015-01-25T12:01:01Z".into(),
-                        source: "a.suitable.path".into(),
-                        pgn: None,
-                        sentence: None,
-                    }),
-                }),
-                propulsion: None,
-            },
-        )])),
-        sources: None,
-    };
+    let expected = V1RootFormat::builder()
+        .version("1.0.0".into())
+        .self_("urn:mrn:imo:mmsi:366982330".into())
+        .add_vessel("urn:mrn:imo:mmsi:366982330".into(),
+                    V1Vessel::builder()
+                        .mmsi("230099999".into())
+                        .navigation(V1Navigation::builder()
+                            .course_over_ground_true(V1NumberValue::builder()
+                                .value(245.69)
+                                .timestamp("2015-01-25T12:01:01Z".into())
+                                .source("a.suitable.path".into())
+                                .build())
+                            .position(V1PositionType::builder()
+                                .value(V1PositionValue::new_3d(-41.156426, 173.1693, 0.0))
+                                .timestamp("2015-01-25T12:01:01Z".into())
+                                .source("a.suitable.path".into())
+                                .build())
+                            .build())
+                        .build(),
+        )
+        .build();
 
     let sk_data =
         read_signalk_from_file("tests/specification/examples/full/0183-RMC-export-min.json");
@@ -171,42 +156,26 @@ fn test_sample_full_0183_rmc_export_min() {
 
 #[test]
 fn test_sample_full_0183_rmc_full() {
-    let expected = V1RootFormat {
-        version: "0.1.0".into(),
-        self_: "urn:mrn:imo:mmsi:366982330".into(),
-        vessels: Some(HashMap::from([(
-            "urn:mrn:imo:mmsi:366982330".into(),
-            V1Vessel {
-                uuid: None,
-                mmsi: Some("366982330".into()),
-                name: None,
-                navigation: Some(V1Navigation {
-                    speed_over_ground: None,
-                    course_over_ground_true: Some(V1NumberValue {
-                        value: 245.69,
-                        timestamp: "2015-03-06T16:57:53.643Z".into(),
-                        source: "sources.gps_0183_RMC".into(),
-                        pgn: None,
-                        sentence: None,
-                    }),
-                    heading_magnetic: None,
-                    position: Some(V1PositionType {
-                        value: V1PositionValue {
-                            latitude: -41.156426,
-                            longitude: 173.1693,
-                            altitude: Some(0.0),
-                        },
-                        timestamp: "2015-03-06T16:57:53.643Z".into(),
-                        source: "sources.gps_0183_RMC".into(),
-                        pgn: None,
-                        sentence: None,
-                    }),
-                }),
-                propulsion: None,
-            },
-        )])),
-        sources: None,
-    };
+    let expected = V1RootFormat::builder()
+        .version("0.1.0".into())
+        .self_("urn:mrn:imo:mmsi:366982330".into())
+        .add_vessel("urn:mrn:imo:mmsi:366982330".into(),
+                    V1Vessel::builder()
+                        .mmsi("366982330".into())
+                        .navigation(V1Navigation::builder()
+                            .course_over_ground_true(V1NumberValue::builder()
+                                .value(245.69)
+                                .timestamp("2015-03-06T16:57:53.643Z".into())
+                                .source("sources.gps_0183_RMC".into())
+                                .build())
+                            .position(V1PositionType::builder()
+                                .value(V1PositionValue::new_3d(-41.156426, 173.1693, 0.0))
+                                .timestamp("2015-03-06T16:57:53.643Z".into())
+                                .source("sources.gps_0183_RMC".into())
+                                .build())
+                            .build())
+                        .build())
+        .build();
     let sk_data = read_signalk_from_file("tests/specification/examples/full/0183-RMC-full.json");
     assert_eq!(sk_data, expected);
 }
