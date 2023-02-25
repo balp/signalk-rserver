@@ -1,11 +1,9 @@
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
+use std::path::{Path, PathBuf};
 
-use signalk_rserver::signalk::{
-    V1Attr, V1Navigation, V1NumberValue, V1PositionType, V1PositionValue, V1Propulsion,
-    V1RootFormat, V1Source, V1SourceProperty, V1Sources, V1Vessel,
-};
+use signalk_rserver::signalk::{V1Attr, V1CommonValueFields, V1Navigation, V1Notification, V1NotificationValue, V1NumberValue, V1PositionType, V1PositionValue, V1Propulsion, V1RootFormat, V1Source, V1SourceProperty, V1Sources, V1Vessel};
 
 trait OptionExt {
     type Value;
@@ -19,7 +17,7 @@ impl<T> OptionExt for Option<T> {
     }
 }
 
-fn read_signalk_from_file(path: &str) -> V1RootFormat {
+fn read_signalk_from_file(path: PathBuf) -> V1RootFormat {
     let file = File::open(path).unwrap();
     let reader = BufReader::new(file);
     let sk_data: V1RootFormat = serde_json::from_reader(reader).unwrap();
@@ -56,7 +54,8 @@ fn test_sample_full_0183_rmc_export() {
                 .build(),
         )
         .build();
-    let sk_data = read_signalk_from_file("tests/specification/examples/full/0183-RMC-export.json");
+    let folder = Path::new("tests/specification/examples/full/");
+    let sk_data = read_signalk_from_file(folder.join("0183-RMC-export.json"));
     assert_eq!(sk_data, expected);
 }
 
@@ -108,8 +107,9 @@ fn test_sample_docs_full_example() {
                 .build())
             .build())
         .build();
+    let folder = Path::new("tests/specification/examples/full/");
     let sk_data =
-        read_signalk_from_file("tests/specification/examples/full/docs-full-example.json");
+        read_signalk_from_file(folder.join("docs-full-example.json"));
 
     assert_eq!(sk_data, expected);
 }
@@ -137,9 +137,8 @@ fn test_sample_full_0183_rmc_export_min() {
                                         ).build(),
                         ).build(),
         ).build();
-
-    let sk_data =
-        read_signalk_from_file("tests/specification/examples/full/0183-RMC-export-min.json");
+    let folder = Path::new("tests/specification/examples/full/");
+    let sk_data = read_signalk_from_file(folder.join("0183-RMC-export-min.json"));
 
     assert_eq!(sk_data, expected);
 }
@@ -167,7 +166,8 @@ fn test_sample_full_0183_rmc_full() {
                                         ).build(),
                         ).build(),
         ).build();
-    let sk_data = read_signalk_from_file("tests/specification/examples/full/0183-RMC-full.json");
+    let folder = Path::new("tests/specification/examples/full/");
+    let sk_data = read_signalk_from_file(folder.join("0183-RMC-full.json"));
     assert_eq!(sk_data, expected);
 }
 
@@ -220,7 +220,8 @@ fn test_sample_docs_data_model() {
                     .build())
                 .build())
         .build();
-    let sk_data = read_signalk_from_file("tests/specification/examples/full/docs-data_model.json");
+    let folder = Path::new("tests/specification/examples/full/");
+    let sk_data = read_signalk_from_file(folder.join("docs-data_model.json"));
     assert_eq!(sk_data, expected);
 }
 
@@ -249,8 +250,8 @@ fn test_sample_docs_data_model_metadata() {
                 .build(),
         )
         .build();
-    let sk_data =
-        read_signalk_from_file("tests/specification/examples/full/docs-data_model_metadata.json");
+    let folder = Path::new("tests/specification/examples/full/");
+    let sk_data = read_signalk_from_file(folder.join("docs-data_model_metadata.json"));
     assert_eq!(sk_data, expected);
 }
 
@@ -277,9 +278,8 @@ fn test_sample_docs_data_model_multiple_values_metadata() {
                 .build(),
         )
         .build();
-    let sk_data = read_signalk_from_file(
-        "tests/specification/examples/full/docs-data_model_multiple_values.json",
-    );
+    let folder = Path::new("tests/specification/examples/full/");
+    let sk_data = read_signalk_from_file(folder.join("docs-data_model_multiple_values.json"));
     assert_eq!(sk_data, expected);
 }
 
@@ -292,10 +292,69 @@ fn test_sample_docs_notifications() {
             "urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into(),
             V1Vessel::builder()
                 .uuid("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
+                .notifications(V1Notification::builder()
+                    .add_child("mob".into(), V1Notification::builder()
+                        .value(V1NotificationValue::builder()
+                            .method("visual".into())
+                            .method("sound".into())
+                            .state("emergency".into())
+                            .message("Man Overboard!".into())
+                            .build())
+                        .common_value_fields(V1CommonValueFields::builder()
+                            .timestamp("2017-04-10T08:33:53Z".into())
+                            .source("nmea1.II".into())
+                            .build())
+                        .build())
+                    .add_child("navigation".into(), V1Notification::builder()
+                        .add_child("gnss".into(), V1Notification::builder()
+                            .value(V1NotificationValue::builder()
+                                .method("visual".into())
+                                .state("alert".into())
+                                .message("GPS signal lost!".into())
+                                .build())
+                            .common_value_fields(V1CommonValueFields::builder()
+                                .timestamp("2017-04-10T08:33:53Z".into())
+                                .source("nmea1.II".into())
+                                .build())
+                            .build())
+                        .add_child("anchor".into(), V1Notification::builder()
+                            .add_child("currentRadius".into(), V1Notification::builder()
+                                .value(V1NotificationValue::builder()
+                                    .method("sound".into())
+                                    .state("alarm".into())
+                                    .message("Dragging anchor!".into())
+                                    .build())
+                                .common_value_fields(V1CommonValueFields::builder()
+                                    .timestamp("2017-04-10T08:33:53Z".into())
+                                    .source("nmea1.II".into())
+                                    .build())
+                                .build())
+                            .build())
+                        .build())
+                    .build())
                 .build(),
         )
         .build();
+    let folder = Path::new("tests/specification/examples/full/");
     let sk_data =
-        read_signalk_from_file("tests/specification/examples/full/docs-notifications.json");
+        read_signalk_from_file(folder.join("docs-notifications.json"));
+    assert_eq!(sk_data, expected);
+}
+
+#[test]
+fn test_sample_electrical_full() {
+    let expected = V1RootFormat::builder()
+        .version("1.0.0".into())
+        .self_("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
+        .add_vessel(
+            "urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into(),
+            V1Vessel::builder()
+                .uuid("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
+                .build(),
+        )
+        .build();
+    let folder = Path::new("tests/specification/examples/full/");
+    let sk_data =
+        read_signalk_from_file(folder.join("electrical-ac-full.json"));
     assert_eq!(sk_data, expected);
 }

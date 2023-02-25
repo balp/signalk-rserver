@@ -68,11 +68,27 @@ impl V1RootFormatBuilder {
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[serde(rename_all = "camelCase")]
 pub struct V1Vessel {
-    pub uuid: Option<String>,
     pub mmsi: Option<String>,
+    pub url: Option<String>,
+    pub uuid: Option<String>,
+    pub mothership_mmsi: Option<String>,
     pub name: Option<String>,
+    pub port: Option<String>,
+    pub flag: Option<String>,
     pub navigation: Option<V1Navigation>,
+    // pub registrations: Option<HashMap<String, V1Registration>>,
+    // pub communication: Option<V1Communication>,
+    // pub environment: Option<V1Environment>,
+    // pub electrical: Option<V1Electrical>,
+    pub notifications: Option<V1Notification>,
+    // pub steering: Option<V1Steering>,
+    // pub tanks: Option<V1Tanks>,
+    // pub design: Option<V1Design>,
+    // pub sails: Option<V1Sails>,
+    // pub sensors: Option<V1Sensors>,
+    // pub performance: Option<V1Performance>,
     pub propulsion: Option<HashMap<String, V1Propulsion>>,
 }
 
@@ -84,36 +100,61 @@ impl V1Vessel {
 
 #[derive(Default)]
 pub struct V1VesselBuilder {
-    uuid: Option<String>,
     mmsi: Option<String>,
+    url: Option<String>,
+    uuid: Option<String>,
+    mothership_mmsi: Option<String>,
     name: Option<String>,
+    flag: Option<String>,
+    port: Option<String>,
     navigation: Option<V1Navigation>,
+    notifications: Option<V1Notification>,
     propulsion: Option<HashMap<String, V1Propulsion>>,
 }
 
 impl V1VesselBuilder {
-    pub fn uuid(mut self, uuid: String) -> V1VesselBuilder {
-        self.uuid = Some(uuid);
+    pub fn uuid(mut self, value: String) -> V1VesselBuilder {
+        self.uuid = Some(value);
         self
     }
-    pub fn mmsi(mut self, mmsi: String) -> V1VesselBuilder {
-        self.mmsi = Some(mmsi);
+    pub fn url(mut self, value: String) -> V1VesselBuilder {
+        self.url = Some(value);
         self
     }
-    pub fn name(mut self, name: String) -> V1VesselBuilder {
-        self.name = Some(name);
+    pub fn mmsi(mut self, value: String) -> V1VesselBuilder {
+        self.mmsi = Some(value);
         self
     }
-    pub fn navigation(mut self, navigation: V1Navigation) -> V1VesselBuilder {
-        self.navigation = Some(navigation);
+    pub fn mothership_mmsi(mut self, value: String) -> V1VesselBuilder {
+        self.mothership_mmsi = Some(value);
         self
     }
-    pub fn add_propulsion(mut self, key: String, propulsion: V1Propulsion) -> V1VesselBuilder {
+    pub fn name(mut self, value: String) -> V1VesselBuilder {
+        self.name = Some(value);
+        self
+    }
+    pub fn port(mut self, value: String) -> V1VesselBuilder {
+        self.port = Some(value);
+        self
+    }
+    pub fn flag(mut self, value: String) -> V1VesselBuilder {
+        self.flag = Some(value);
+        self
+    }
+    pub fn navigation(mut self, value: V1Navigation) -> V1VesselBuilder {
+        self.navigation = Some(value);
+        self
+    }
+    pub fn notifications(mut self, value: V1Notification) -> V1VesselBuilder {
+        self.notifications = Some(value);
+        self
+    }
+    pub fn add_propulsion(mut self, key: String, value: V1Propulsion) -> V1VesselBuilder {
         if self.propulsion.is_none() {
             self.propulsion = Some(HashMap::new());
         }
         if let Some(ref mut x) = self.propulsion {
-            x.insert(key, propulsion);
+            x.insert(key, value);
         }
         self
     }
@@ -122,8 +163,13 @@ impl V1VesselBuilder {
             uuid: self.uuid,
             mmsi: self.mmsi,
             name: self.name,
+            port: self.port,
+            flag: self.flag,
             navigation: self.navigation,
+            notifications: self.notifications,
             propulsion: self.propulsion,
+            url: self.url,
+            mothership_mmsi: self.mothership_mmsi,
         }
     }
 }
@@ -145,6 +191,7 @@ pub struct V1Propulsion {
     pub intake_manifold_temperature: Option<V1NumberValue>,
     pub engine_load: Option<V1NumberValue>,
     pub engine_torque: Option<V1NumberValue>,
+    // pub transmission: Option<V1Transmission>,
 }
 
 impl V1Propulsion {
@@ -266,10 +313,36 @@ pub enum V1PropulsionState {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct V1Navigation {
-    pub speed_over_ground: Option<V1NumberValue>,
+    // pub course: Option<V1Course>,
+    // pub lights: Option<V1Lights>,
+    pub course_over_ground_magnetic: Option<V1NumberValue>,
     pub course_over_ground_true: Option<V1NumberValue>,
+    pub course_rhumbline: Option<V1NumberValue>,
+    pub course_great_circle: Option<V1NumberValue>,
+    // pub closest_approach: Option<V1ClosestApproach>,
+    // pub racing: Option<V1Racing>,
+    pub magnetic_variation: Option<V1NumberValue>,
+    pub magnetic_variation_age_of_service: Option<V1NumberValue>,
+    // pub destination: Option<V1Destination>,
+    // pub gnss: Option<V1gnss>,
     pub heading_magnetic: Option<V1NumberValue>,
+    pub magnetic_deviation: Option<V1NumberValue>,
+    pub heading_compass: Option<V1NumberValue>,
+    pub heading_true: Option<V1NumberValue>,
     pub position: Option<V1PositionType>,
+    // pub attitude: Option<V1AttitudeType>,
+    // pub maneuver: Option<V1Maneuver>,
+    pub rate_of_turn: Option<V1NumberValue>,
+    pub speed_over_ground: Option<V1NumberValue>,
+    pub speed_through_water: Option<V1NumberValue>,
+    pub speed_through_water_transverse: Option<V1NumberValue>,
+    pub speed_through_water_longitudinal: Option<V1NumberValue>,
+    pub leeway_angle: Option<V1NumberValue>,
+    pub log: Option<V1NumberValue>,
+    // pub trip: Option<V1Trip>,
+    // pub state: Option<V1State>,
+    // pub anchor: Option<V1Anchor>,
+    // pub datetime: Option<V1Datetime>,
 }
 
 impl V1Navigation {
@@ -280,41 +353,307 @@ impl V1Navigation {
 
 #[derive(Default)]
 pub struct V1NavigationBuilder {
-    pub speed_over_ground: Option<V1NumberValue>,
-    pub course_over_ground_true: Option<V1NumberValue>,
-    pub heading_magnetic: Option<V1NumberValue>,
-    pub position: Option<V1PositionType>,
+    // pub course: Option<V1Course>,
+    // pub lights: Option<V1Lights>,
+    course_over_ground_magnetic: Option<V1NumberValue>,
+    course_over_ground_true: Option<V1NumberValue>,
+    course_rhumbline: Option<V1NumberValue>,
+    course_great_circle: Option<V1NumberValue>,
+    // pub closest_approach: Option<V1ClosestApproach>,
+    // pub racing: Option<V1Racing>,
+    magnetic_variation: Option<V1NumberValue>,
+    magnetic_variation_age_of_service: Option<V1NumberValue>,
+    // pub destination: Option<V1Destination>,
+    // pub gnss: Option<V1gnss>,
+    heading_magnetic: Option<V1NumberValue>,
+    magnetic_deviation: Option<V1NumberValue>,
+    heading_compass: Option<V1NumberValue>,
+    heading_true: Option<V1NumberValue>,
+    position: Option<V1PositionType>,
+    // pub attitude: Option<V1AttitudeType>,
+    // pub maneuver: Option<V1Maneuver>,
+    rate_of_turn: Option<V1NumberValue>,
+    speed_over_ground: Option<V1NumberValue>,
+    speed_through_water: Option<V1NumberValue>,
+    speed_through_water_transverse: Option<V1NumberValue>,
+    speed_through_water_longitudinal: Option<V1NumberValue>,
+    leeway_angle: Option<V1NumberValue>,
+    log: Option<V1NumberValue>,
+    // pub trip: Option<V1Trip>,
+    // pub state: Option<V1State>,
+    // pub anchor: Option<V1Anchor>,
+    // pub datetime: Option<V1Datetime>,
 }
 
 impl V1NavigationBuilder {
-    pub fn speed_over_ground(mut self, speed_over_ground: V1NumberValue) -> V1NavigationBuilder {
-        self.speed_over_ground = Some(speed_over_ground);
+    pub fn course_over_ground_magnetic(mut self, value: V1NumberValue) -> V1NavigationBuilder {
+        self.course_over_ground_magnetic = Some(value);
         self
     }
-    pub fn course_over_ground_true(
-        mut self,
-        course_over_ground_true: V1NumberValue,
-    ) -> V1NavigationBuilder {
-        self.course_over_ground_true = Some(course_over_ground_true);
+    pub fn course_over_ground_true(mut self, value: V1NumberValue) -> V1NavigationBuilder {
+        self.course_over_ground_true = Some(value);
         self
     }
-    pub fn heading_magnetic(mut self, heading_magnetic: V1NumberValue) -> V1NavigationBuilder {
-        self.heading_magnetic = Some(heading_magnetic);
+    pub fn course_rhumbline(mut self, value: V1NumberValue) -> V1NavigationBuilder {
+        self.course_rhumbline = Some(value);
+        self
+    }
+    pub fn course_great_circle(mut self, value: V1NumberValue) -> V1NavigationBuilder {
+        self.course_great_circle = Some(value);
+        self
+    }
+    pub fn magnetic_variation(mut self, value: V1NumberValue) -> V1NavigationBuilder {
+        self.magnetic_variation = Some(value);
+        self
+    }
+    pub fn magnetic_variation_age_of_service(mut self, value: V1NumberValue) -> V1NavigationBuilder {
+        self.magnetic_variation_age_of_service = Some(value);
+        self
+    }
+    pub fn heading_magnetic(mut self, value: V1NumberValue) -> V1NavigationBuilder {
+        self.heading_magnetic = Some(value);
+        self
+    }
+    pub fn magnetic_deviation(mut self, value: V1NumberValue) -> V1NavigationBuilder {
+        self.magnetic_deviation = Some(value);
+        self
+    }
+    pub fn heading_compass(mut self, value: V1NumberValue) -> V1NavigationBuilder {
+        self.heading_compass = Some(value);
+        self
+    }
+    pub fn heading_true(mut self, value: V1NumberValue) -> V1NavigationBuilder {
+        self.heading_true = Some(value);
         self
     }
     pub fn position(mut self, position: V1PositionType) -> V1NavigationBuilder {
         self.position = Some(position);
         self
     }
+    pub fn rate_of_turn(mut self, value: V1NumberValue) -> V1NavigationBuilder {
+        self.rate_of_turn = Some(value);
+        self
+    }
+    pub fn speed_over_ground(mut self, value: V1NumberValue) -> V1NavigationBuilder {
+        self.speed_over_ground = Some(value);
+        self
+    }
+    pub fn speed_through_water(mut self, value: V1NumberValue) -> V1NavigationBuilder {
+        self.speed_through_water = Some(value);
+        self
+    }
+    pub fn speed_through_water_transverse(mut self, value: V1NumberValue) -> V1NavigationBuilder {
+        self.speed_through_water_transverse = Some(value);
+        self
+    }
+    pub fn speed_through_water_longitudinal(mut self, value: V1NumberValue) -> V1NavigationBuilder {
+        self.speed_through_water_longitudinal = Some(value);
+        self
+    }
+    pub fn leeway_angle(mut self, value: V1NumberValue) -> V1NavigationBuilder {
+        self.leeway_angle = Some(value);
+        self
+    }
+    pub fn log(mut self, value: V1NumberValue) -> V1NavigationBuilder {
+        self.log = Some(value);
+        self
+    }
     pub fn build(self) -> V1Navigation {
         V1Navigation {
+            course_over_ground_magnetic: self.course_over_ground_magnetic,
             speed_over_ground: self.speed_over_ground,
+            speed_through_water: self.speed_through_water,
+            speed_through_water_transverse: self.speed_through_water_transverse,
+            speed_through_water_longitudinal: self.speed_through_water_longitudinal,
+            leeway_angle: self.leeway_angle,
             course_over_ground_true: self.course_over_ground_true,
+            course_rhumbline: self.course_rhumbline,
+            course_great_circle: self.course_great_circle,
+            magnetic_variation: self.magnetic_variation,
+            magnetic_variation_age_of_service: self.magnetic_variation_age_of_service,
             heading_magnetic: self.heading_magnetic,
+            magnetic_deviation: self.magnetic_deviation,
+            heading_compass: self.heading_compass,
+            heading_true: self.heading_true,
             position: self.position,
+            rate_of_turn: self.rate_of_turn,
+            log: self.log,
         }
     }
 }
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+pub struct V1Notification {
+    pub value: Option<V1NotificationValue>,
+    #[serde(flatten)]
+    pub common_value_fields: Option<V1CommonValueFields>,
+    #[serde(flatten)]
+    pub childs: HashMap<String, V1Notification>,
+}
+
+impl V1Notification {
+    pub fn builder() -> V1NotificationBuilder {
+        V1NotificationBuilder::default()
+    }
+}
+
+#[derive(Default)]
+pub struct V1NotificationBuilder {
+    value: Option<V1NotificationValue>,
+    common_value_fields: Option<V1CommonValueFields>,
+    childs: HashMap<String, V1Notification>,
+}
+
+impl V1NotificationBuilder {
+    pub fn value(mut self, value: V1NotificationValue) -> V1NotificationBuilder {
+        self.value = Some(value);
+        self
+    }
+    pub fn common_value_fields(mut self, value: V1CommonValueFields) -> V1NotificationBuilder {
+        self.common_value_fields = Some(value);
+        self
+    }
+    pub fn add_child(mut self, key: String, value: V1Notification) -> V1NotificationBuilder {
+        self.childs.insert(key, value);
+        self
+    }
+    pub fn build(self) -> V1Notification {
+        V1Notification {
+            value: self.value,
+            common_value_fields: self.common_value_fields,
+            childs: self.childs,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+pub struct V1NotificationValue {
+    pub method: Vec<String>,
+    pub state: String,
+    pub message: String,
+}
+
+impl V1NotificationValue {
+    pub fn builder() -> V1NotificationValueBuilder {
+        V1NotificationValueBuilder::default()
+    }
+}
+
+#[derive(Default)]
+pub struct V1NotificationValueBuilder {
+    method: Vec<String>,
+    state: String,
+    message: String,
+}
+
+impl V1NotificationValueBuilder {
+    pub fn method(mut self, value: String) -> V1NotificationValueBuilder {
+        self.method.push(value);
+        self
+    }
+    pub fn state(mut self, value: String) -> V1NotificationValueBuilder {
+        self.state = value;
+        self
+    }
+    pub fn message(mut self, value: String) -> V1NotificationValueBuilder {
+        self.message = value;
+        self
+    }
+    pub fn build(self) -> V1NotificationValue {
+        V1NotificationValue {
+            method: self.method,
+            state: self.state,
+            message: self.message,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+pub struct V1CommonValueFields {
+    pub timestamp: String,
+    #[serde(rename = "$source")]
+    pub source: String,
+    #[serde(rename = "_attr")]
+    pub attr: Option<V1Attr>,
+    pub meta: Option<V1Meta>,
+    pub pgn: Option<i64>,
+    pub sentence: Option<String>,
+}
+
+impl V1CommonValueFields {
+    pub fn builder() -> V1CommonValueFieldsBuilder {
+        V1CommonValueFieldsBuilder::default()
+    }
+}
+
+#[derive(Default)]
+pub struct V1CommonValueFieldsBuilder {
+    timestamp: String,
+    source: String,
+    attr: Option<V1Attr>,
+    meta: Option<V1Meta>,
+    pgn: Option<i64>,
+    sentence: Option<String>,
+}
+
+impl V1CommonValueFieldsBuilder {
+    pub fn timestamp(mut self, value: String) -> V1CommonValueFieldsBuilder {
+        self.timestamp = value;
+        self
+    }
+    pub fn source(mut self, value: String) -> V1CommonValueFieldsBuilder {
+        self.source = value;
+        self
+    }
+    pub fn attr(mut self, value: V1Attr) -> V1CommonValueFieldsBuilder {
+        self.attr = Some(value);
+        self
+    }
+    pub fn meta(mut self, value: V1Meta) -> V1CommonValueFieldsBuilder {
+        self.meta = Some(value);
+        self
+    }
+    pub fn pgn(mut self, value: i64) -> V1CommonValueFieldsBuilder {
+        self.pgn = Some(value);
+        self
+    }
+    pub fn sentence(mut self, value: String) -> V1CommonValueFieldsBuilder {
+        self.sentence = Some(value);
+        self
+    }
+    pub fn build(self) -> V1CommonValueFields {
+        V1CommonValueFields {
+            timestamp: self.timestamp,
+            source: self.source,
+            attr: self.attr,
+            meta: self.meta,
+            pgn: self.pgn,
+            sentence: self.sentence,
+        }
+    }
+}
+
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct V1Meta {
+    pub description: String,
+    pub display_name: Option<String>,
+    pub long_name: Option<String>,
+    pub short_name: Option<String>,
+    #[serde(rename = "enum")]
+    pub enum_: Option<String>,
+    // pub properties: Option<properties>,
+    pub units: Option<String>,
+    // pub display_scale: Option<V1DisplayScale>,
+    pub timeout: Option<f64>,
+    pub alert_method: Option<Vec<String>>,
+    pub warn_method: Option<Vec<String>>,
+    pub alarm_method: Option<Vec<String>>,
+    pub emergency_method: Option<Vec<String>>,
+    // pub zones: Option<Vec<V1Zones>>,
+}
+
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1NumberValue {
@@ -541,7 +880,8 @@ pub struct V1SourceProperty {
     // pub ais: V1SourceAIS,
     // pub n2k: V1SourceN2K,
     pub talker: Option<String>,
-    pub sentences: Option<HashMap<String, String>>, // TODO: Not optional?
+    pub sentences: Option<HashMap<String, String>>,
+    // TODO: Not optional?
     #[serde(flatten)]
     pub extras: HashMap<String, String>,
 }
@@ -584,7 +924,6 @@ impl V1SourcePropertyBuilder {
             extras: self.extras,
         }
     }
-
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
