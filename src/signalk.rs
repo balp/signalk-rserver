@@ -81,7 +81,7 @@ pub struct V1Vessel {
     // pub registrations: Option<HashMap<String, V1Registration>>,
     // pub communication: Option<V1Communication>,
     // pub environment: Option<V1Environment>,
-    // pub electrical: Option<V1Electrical>,
+    pub electrical: Option<V1Electrical>,
     pub notifications: Option<V1Notification>,
     // pub steering: Option<V1Steering>,
     // pub tanks: Option<V1Tanks>,
@@ -108,6 +108,7 @@ pub struct V1VesselBuilder {
     flag: Option<String>,
     port: Option<String>,
     navigation: Option<V1Navigation>,
+    electrical: Option<V1Electrical>,
     notifications: Option<V1Notification>,
     propulsion: Option<HashMap<String, V1Propulsion>>,
 }
@@ -145,6 +146,10 @@ impl V1VesselBuilder {
         self.navigation = Some(value);
         self
     }
+    pub fn electrical(mut self, value: V1Electrical) -> V1VesselBuilder {
+        self.electrical = Some(value);
+        self
+    }
     pub fn notifications(mut self, value: V1Notification) -> V1VesselBuilder {
         self.notifications = Some(value);
         self
@@ -166,6 +171,7 @@ impl V1VesselBuilder {
             port: self.port,
             flag: self.flag,
             navigation: self.navigation,
+            electrical: self.electrical,
             notifications: self.notifications,
             propulsion: self.propulsion,
             url: self.url,
@@ -406,7 +412,10 @@ impl V1NavigationBuilder {
         self.magnetic_variation = Some(value);
         self
     }
-    pub fn magnetic_variation_age_of_service(mut self, value: V1NumberValue) -> V1NavigationBuilder {
+    pub fn magnetic_variation_age_of_service(
+        mut self,
+        value: V1NumberValue,
+    ) -> V1NavigationBuilder {
         self.magnetic_variation_age_of_service = Some(value);
         self
     }
@@ -569,6 +578,159 @@ impl V1NotificationValueBuilder {
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+pub struct V1Electrical {
+    pub batteries: Option<HashMap<String, V1Battery>>,
+    pub inverters: Option<HashMap<String, V1Inverter>>,
+    // pub chargers: HashMap<String,V1Chargers>,
+    // pub alternators: HashMap<String,V1Alternators>,
+    // pub solar: HashMap<String,V1Solar>,
+    // pub ac: HashMap<String,V1ACBuses>,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct V1ElectricalIdentity {
+    pub name: Option<String>,
+    pub location: Option<String>,
+    pub date_installed: Option<String>,
+    pub manufacturer: Option<V1ElectricalManufacturer>,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+pub struct V1ElectricalManufacturer {
+    pub name: Option<String>,
+    pub model: Option<String>,
+    #[serde(rename = "URL")]
+    pub url: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct V1ElectricalDCQualities {
+    pub associated_bus: Option<String>,
+    pub voltage: Option<V1ElectricalDCVoltageValue>,
+    pub current: Option<V1ElectricalDCCurrentValue>,
+    pub temperature: Option<V1ElectricalDCTemperatureValue>,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct V1ElectricalDCVoltageValue {
+    #[serde(flatten)]
+    pub value: Option<V1NumberValue>,
+    pub ripple: Option<V1NumberValue>,
+    pub meta: Option<V1ElectricalDCVoltageMeta>,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct V1ElectricalDCVoltageMeta {
+    pub nominal: Option<f64>,
+    pub warn_upper: Option<f64>,
+    pub warn_lower: Option<f64>,
+    pub fault_upper: Option<f64>,
+    pub fault_lower: Option<f64>,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct V1ElectricalDCCurrentValue {
+    #[serde(flatten)]
+    pub value: Option<V1NumberValue>,
+    pub meta: Option<V1ElectricalDCCurrentMeta>,
+}
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct V1ElectricalDCCurrentMeta {
+    #[serde(flatten)]
+    pub warn_upper: Option<f64>,
+    pub warn_lower: Option<f64>,
+    pub fault_upper: Option<f64>,
+    pub fault_lower: Option<f64>,
+}
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct V1ElectricalDCTemperatureValue {
+    #[serde(flatten)]
+    pub value: Option<V1NumberValue>,
+    pub warn_upper: Option<f64>,
+    pub warn_lower: Option<f64>,
+    pub fault_upper: Option<f64>,
+    pub fault_lower: Option<f64>,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct V1ElectricalACQualities {
+    pub associated_bus: Option<String>,
+    pub line_neutral_voltage: Option<f64>,
+    pub line_line_voltage: Option<f64>,
+    pub current: Option<f64>,
+    pub frequency: Option<f64>,
+    pub reactive_power: Option<f64>,
+    pub power_factor: Option<f64>,
+    pub power_factor_lagging: Option<String>,
+    pub real_power: Option<f64>,
+    pub apparent_power: Option<f64>,
+}
+
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct V1BatteryTemperature {
+    pub limit_discharge_lower: Option<f64>,
+    pub limit_discharge_upper: Option<f64>,
+    pub limit_recharge_lower: Option<f64>,
+    pub limit_recharge_upper: Option<f64>,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct V1BatteryCapacity {
+    pub nominal: Option<f64>,
+    pub actual: Option<f64>,
+    pub remaining: Option<f64>,
+    pub discharge_limit: Option<f64>,
+    pub state_of_charge: Option<f64>,
+    pub state_of_health: Option<f64>,
+    pub discharge_since_full: Option<f64>,
+    pub time_remaining: Option<f64>,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+pub struct V1Battery {
+    #[serde(flatten)]
+    pub identity: Option<V1ElectricalIdentity>,
+    #[serde(flatten)]
+    pub dc_qualities: Option<V1ElectricalDCQualities>,
+    pub chemistry: Option<String>,
+    pub temperature: Option<V1BatteryTemperature>,
+    pub capacity: Option<V1BatteryCapacity>,
+    pub lifetime_discharge: Option<f64>,
+    pub lifetime_recharge: Option<f64>,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+pub struct V1ElectricalInverterMode {
+    #[serde(flatten)]
+    pub common: Option<V1CommonValueFields>,
+    pub value: Option<String>,
+
+}
+
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+pub struct V1Inverter {
+    #[serde(flatten)]
+    pub identity: Option<V1ElectricalIdentity>,
+    pub dc: Option<V1ElectricalDCQualities>,
+    pub ac: Option<V1ElectricalACQualities>,
+    pub inverter_mode: Option<V1ElectricalInverterMode>,
+}
+
+
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1CommonValueFields {
     pub timestamp: String,
     #[serde(rename = "$source")]
@@ -633,7 +795,6 @@ impl V1CommonValueFieldsBuilder {
     }
 }
 
-
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct V1Meta {
@@ -653,7 +814,6 @@ pub struct V1Meta {
     pub emergency_method: Option<Vec<String>>,
     // pub zones: Option<Vec<V1Zones>>,
 }
-
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1NumberValue {
