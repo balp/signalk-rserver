@@ -451,6 +451,24 @@ pub struct V1Sources {
     pub fields: HashMap<String, V1Source>,
 }
 
+impl V1Sources {
+    pub fn builder() -> V1SourcesBuilder { V1SourcesBuilder::default() }
+}
+
+#[derive(Default)]
+pub struct V1SourcesBuilder {
+    type_: Option<V1Attr>,
+    pub fields: HashMap<String, V1Source>,
+}
+impl V1SourcesBuilder {
+    pub fn build(self) -> V1Sources {
+        V1Sources { type_: ,
+            fields: Default::default()
+        }
+    }
+}
+
+
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1Source {
     pub label: Option<String>,
