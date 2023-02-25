@@ -204,7 +204,10 @@ impl V1PropulsionBuilder {
         self.run_time = Some(run_time);
         self
     }
-    pub fn coolant_temperature(mut self, coolant_temperature: V1NumberValue) -> V1PropulsionBuilder {
+    pub fn coolant_temperature(
+        mut self,
+        coolant_temperature: V1NumberValue,
+    ) -> V1PropulsionBuilder {
         self.coolant_temperature = Some(coolant_temperature);
         self
     }
@@ -216,7 +219,10 @@ impl V1PropulsionBuilder {
         self.boost_pressure = Some(boost_pressure);
         self
     }
-    pub fn intake_manifold_temperature(mut self, intake_manifold_temperature: V1NumberValue) -> V1PropulsionBuilder {
+    pub fn intake_manifold_temperature(
+        mut self,
+        intake_manifold_temperature: V1NumberValue,
+    ) -> V1PropulsionBuilder {
         self.intake_manifold_temperature = Some(intake_manifold_temperature);
         self
     }
@@ -377,6 +383,7 @@ pub struct V1PositionType {
     pub pgn: Option<f64>,
     pub sentence: Option<String>,
 }
+
 impl V1PositionType {
     pub fn builder() -> V1PositionTypeBuilder {
         V1PositionTypeBuilder::default()
@@ -422,9 +429,7 @@ impl V1PositionTypeBuilder {
             sentence: self.sentence,
         }
     }
-    
 }
-
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1PositionValue {
@@ -435,12 +440,19 @@ pub struct V1PositionValue {
 
 impl V1PositionValue {
     pub fn new_2d(latitude: f64, longitude: f64) -> V1PositionValue {
-        V1PositionValue { latitude, longitude, altitude: None }
+        V1PositionValue {
+            latitude,
+            longitude,
+            altitude: None,
+        }
     }
     pub fn new_3d(latitude: f64, longitude: f64, altitude: f64) -> V1PositionValue {
-        V1PositionValue { latitude, longitude, altitude: Some(altitude) }
+        V1PositionValue {
+            latitude,
+            longitude,
+            altitude: Some(altitude),
+        }
     }
-
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
@@ -452,7 +464,9 @@ pub struct V1Sources {
 }
 
 impl V1Sources {
-    pub fn builder() -> V1SourcesBuilder { V1SourcesBuilder::default() }
+    pub fn builder() -> V1SourcesBuilder {
+        V1SourcesBuilder::default()
+    }
 }
 
 #[derive(Default)]
@@ -460,14 +474,23 @@ pub struct V1SourcesBuilder {
     type_: Option<V1Attr>,
     pub fields: HashMap<String, V1Source>,
 }
+
 impl V1SourcesBuilder {
+    pub fn t(mut self, type_: V1Attr) -> V1SourcesBuilder {
+        self.type_ = Some(type_);
+        self
+    }
+    pub fn add_field(mut self, key: String, value: V1Source) -> V1SourcesBuilder {
+        self.fields.insert(key, value);
+        self
+    }
     pub fn build(self) -> V1Sources {
-        V1Sources { type_: ,
-            fields: Default::default()
+        V1Sources {
+            type_: self.type_,
+            fields: self.fields,
         }
     }
 }
-
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1Source {
@@ -478,17 +501,93 @@ pub struct V1Source {
     pub properties: HashMap<String, V1SourceProperty>,
 }
 
+impl V1Source {
+    pub fn builder() -> V1SourceBuilder {
+        V1SourceBuilder::default()
+    }
+}
+
+#[derive(Default)]
+pub struct V1SourceBuilder {
+    label: Option<String>,
+    type_: Option<String>,
+    properties: HashMap<String, V1SourceProperty>,
+}
+
+impl V1SourceBuilder {
+    pub fn label(mut self, label: String) -> V1SourceBuilder {
+        self.label = Some(label);
+        self
+    }
+    pub fn type_(mut self, type_: String) -> V1SourceBuilder {
+        self.type_ = Some(type_);
+        self
+    }
+    pub fn add_property(mut self, key: String, property: V1SourceProperty) -> V1SourceBuilder {
+        self.properties.insert(key, property);
+        self
+    }
+    pub fn build(self) -> V1Source {
+        V1Source {
+            label: self.label,
+            type_: self.type_,
+            properties: self.properties,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1SourceProperty {
     // pub ais: V1SourceAIS,
     // pub n2k: V1SourceN2K,
     pub talker: Option<String>,
-    pub sentences: Option<HashMap<String, String>>,
+    pub sentences: Option<HashMap<String, String>>, // TODO: Not optional?
     #[serde(flatten)]
     pub extras: HashMap<String, String>,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+impl V1SourceProperty {
+    pub fn builder() -> V1SourcePropertyBuilder {
+        V1SourcePropertyBuilder::default()
+    }
+}
+
+#[derive(Default)]
+pub struct V1SourcePropertyBuilder {
+    talker: Option<String>,
+    sentences: Option<HashMap<String, String>>,
+    extras: HashMap<String, String>,
+}
+
+impl V1SourcePropertyBuilder {
+    pub fn talker(mut self, talker: String) -> V1SourcePropertyBuilder {
+        self.talker = Some(talker);
+        self
+    }
+    pub fn add_sentence(mut self, key: String, sentence: String) -> V1SourcePropertyBuilder {
+        if self.sentences.is_none() {
+            self.sentences = Some(HashMap::new());
+        }
+        if let Some(ref mut x) = self.sentences {
+            x.insert(key, sentence);
+        }
+        self
+    }
+    pub fn add_extra(mut self, key: String, value: String) -> V1SourcePropertyBuilder {
+        self.extras.insert(key, value);
+        self
+    }
+    pub fn build(self) -> V1SourceProperty {
+        V1SourceProperty {
+            talker: self.talker,
+            sentences: self.sentences,
+            extras: self.extras,
+        }
+    }
+
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct V1Attr {
     #[serde(rename = "_mode")]
     pub mode: Option<i64>,
@@ -496,4 +595,24 @@ pub struct V1Attr {
     pub owner: Option<String>,
     #[serde(rename = "_group")]
     pub group: Option<String>,
+}
+
+impl Default for V1Attr {
+    fn default() -> Self {
+        V1Attr {
+            mode: Some(644),
+            owner: Some("self".into()),
+            group: Some("self".into()),
+        }
+    }
+}
+
+impl V1Attr {
+    pub fn new(mode: i64, owner: String, group: String) -> V1Attr {
+        V1Attr {
+            mode: Some(mode),
+            owner: Some(owner),
+            group: Some(group),
+        }
+    }
 }
