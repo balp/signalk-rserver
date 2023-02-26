@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 
-use signalk_rserver::signalk::{V1ACBus, V1Attr, V1CommonValueFields, V1Electrical, V1ElectricalACQualities, V1ElectricalIdentity, V1Environment, V1EnvironmentDepth, V1Navigation, V1Notification, V1NotificationValue, V1NumberValue, V1PositionType, V1PositionValue, V1Propulsion, V1RootFormat, V1Source, V1SourceProperty, V1Sources, V1Vessel};
+use signalk_rserver::signalk::{V1ACBus, V1Attr, V1CommonValueFields, V1Electrical, V1ElectricalACQualities, V1ElectricalIdentity, V1Environment, V1EnvironmentDepth, V1EnvironmentTime, V1Navigation, V1Notification, V1NotificationValue, V1NumberValue, V1PositionType, V1PositionValue, V1Propulsion, V1RootFormat, V1Source, V1SourceProperty, V1Sources, V1Vessel};
 
 trait OptionExt {
     type Value;
@@ -736,6 +736,35 @@ fn test_sample_depth_meta_attr() {
         ).build();
     let folder = Path::new("tests/specification/examples/full/");
     let sk_data = read_signalk_from_file(folder.join("signalk-depth-meta-attr.json"));
+    assert_eq!(sk_data, expected);
+}
+
+
+
+#[test]
+fn test_sample_vessel_time() {
+    let expected = V1RootFormat::builder()
+        .version("1.0.0".into())
+        .self_("urn:mrn:signalk:uuid:b7590868-1d62-47d9-989c-32321b349fb9".into())
+        .add_vessel(
+            "urn:mrn:signalk:uuid:b7590868-1d62-47d9-989c-32321b349fb9".into(),
+            V1Vessel::builder()
+                .uuid("urn:mrn:signalk:uuid:b7590868-1d62-47d9-989c-32321b349fb9".into())
+                .environment(V1Environment::builder()
+                    .time(V1EnvironmentTime::builder()
+                        .millis(1449648657735)
+                        .timezone_offset(-1300)
+                        .timestamp("2014-04-10T08:33:53Z".into())
+                        .source(V1Source::builder()
+                            .label("Realtime clock".into())
+                            .type_("system".into())
+                            .build())
+                        .build())
+                    .build())
+                .build(),
+        ).build();
+    let folder = Path::new("tests/specification/examples/full/");
+    let sk_data = read_signalk_from_file(folder.join("vessel-time.json"));
     assert_eq!(sk_data, expected);
 }
 

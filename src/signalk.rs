@@ -1000,7 +1000,53 @@ pub struct V1EnvironmentTime {
     pub timezone_offset: Option<i64>,
     pub timezone_region: Option<String>,
     pub timestamp: Option<String>,
-    pub source: Option<String>,
+    pub source: Option<V1Source>,
+}
+
+impl V1EnvironmentTime {
+    pub fn builder() -> V1EnvironmentTimeBuilder {
+        V1EnvironmentTimeBuilder::default()
+    }
+}
+#[derive(Default)]
+pub struct V1EnvironmentTimeBuilder {
+     millis: Option<i64>,
+     timezone_offset: Option<i64>,
+     timezone_region: Option<String>,
+     timestamp: Option<String>,
+     source: Option<V1Source>,
+}
+
+impl V1EnvironmentTimeBuilder {
+    pub fn millis(mut self, value: i64) -> V1EnvironmentTimeBuilder {
+        self.millis = Some(value);
+        self
+    }
+    pub fn timezone_offset(mut self, value: i64) -> V1EnvironmentTimeBuilder {
+        self.timezone_offset = Some(value);
+        self
+    }
+    pub fn timezone_region(mut self, value: String) -> V1EnvironmentTimeBuilder {
+        self.timezone_region = Some(value);
+        self
+    }
+    pub fn timestamp(mut self, value: String) -> V1EnvironmentTimeBuilder {
+        self.timestamp = Some(value);
+        self
+    }
+    pub fn source(mut self, value: V1Source) -> V1EnvironmentTimeBuilder {
+        self.source = Some(value);
+        self
+    }
+    pub fn build(self) -> V1EnvironmentTime {
+        V1EnvironmentTime {
+            millis: self.millis,
+            timezone_offset: self.timezone_offset,
+            timezone_region: self.timezone_region,
+            timestamp: self.timestamp,
+            source: self.source,
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
@@ -2299,8 +2345,8 @@ pub struct V1SourcePropertyBuilder {
 }
 
 impl V1SourcePropertyBuilder {
-    pub fn talker(mut self, talker: String) -> V1SourcePropertyBuilder {
-        self.talker = Some(talker);
+    pub fn talker(mut self, value: String) -> V1SourcePropertyBuilder {
+        self.talker = Some(value);
         self
     }
     pub fn add_sentence(mut self, key: String, sentence: String) -> V1SourcePropertyBuilder {
