@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 
-use signalk_rserver::signalk::{V1ACBus, V1Attr, V1CommonValueFields, V1Electrical, V1ElectricalACQualities, V1ElectricalIdentity, V1Navigation, V1Notification, V1NotificationValue, V1NumberValue, V1PositionType, V1PositionValue, V1Propulsion, V1RootFormat, V1Source, V1SourceProperty, V1Sources, V1Vessel};
+use signalk_rserver::signalk::{V1ACBus, V1Attr, V1CommonValueFields, V1Electrical, V1ElectricalACQualities, V1ElectricalIdentity, V1Environment, V1EnvironmentDepth, V1Navigation, V1Notification, V1NotificationValue, V1NumberValue, V1PositionType, V1PositionValue, V1Propulsion, V1RootFormat, V1Source, V1SourceProperty, V1Sources, V1Vessel};
 
 trait OptionExt {
     type Value;
@@ -627,3 +627,115 @@ fn test_sample_electrical_full() {
     let sk_data = read_signalk_from_file(folder.join("electrical-ac-full.json"));
     assert_eq!(sk_data, expected);
 }
+
+#[test]
+fn test_sample_mob_alarm() {
+    let expected = V1RootFormat::builder()
+        .version("1.0.0".into())
+        .self_("urn:mrn:imo:mmsi:366982330".into())
+        .add_vessel(
+            "urn:mrn:imo:mmsi:366982330".into(),
+            V1Vessel::builder()
+                .mmsi("366982330".into())
+                .notifications(
+                    V1Notification::builder()
+                        .add_child(
+                            "mob".into(),
+                            V1Notification::builder()
+                                .value(
+                                    V1NotificationValue::builder()
+                                        .method("visual".into())
+                                        .method("sound".into())
+                                        .state("emergency".into())
+                                        .message("MOB".into())
+                                        .build(),
+                                )
+                                .common_value_fields(
+                                    V1CommonValueFields::builder()
+                                        .timestamp("2014-04-10T08:33:53Z".into())
+                                        .source("sources.gps_0183_MOB".into())
+                                        .build(),
+                                )
+                                .build(),
+                        )
+                        .build(),
+                )
+                .build(),
+        )
+        .build();
+    let folder = Path::new("tests/specification/examples/full/");
+    let sk_data = read_signalk_from_file(folder.join("mob-alarm.json"));
+    assert_eq!(sk_data, expected);
+}
+
+#[test]
+fn test_sample_depth_alarm() {
+    let expected = V1RootFormat::builder()
+        .version("1.0.0".into())
+        .self_("urn:mrn:signalk:uuid:b7590868-1d62-47d9-989c-32321b349fb9".into())
+        .add_vessel(
+            "urn:mrn:signalk:uuid:b7590868-1d62-47d9-989c-32321b349fb9".into(),
+            V1Vessel::builder()
+                .uuid("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
+                .notifications(
+                    V1Notification::builder()
+                        .add_child(
+                            "environment".into(),
+                            V1Notification::builder()
+                                .add_child(
+                                    "depth".into(),
+                                    V1Notification::builder()
+                                        .add_child(
+                                            "belowKeel".into(),
+                                            V1Notification::builder()
+                                                .value(V1NotificationValue::builder()
+                                                    .message("Running aground!".into())
+                                                    .state("alarm".into())
+                                                    .method("sound".into())
+                                                    .build())
+                                                .common_value_fields(V1CommonValueFields::builder()
+                                                    .timestamp("2014-04-10T08:33:53Z".into())
+                                                    .source("nmea1.II".into())
+                                                    .build())
+                                                .build(),
+                                        )
+                                        .build(),
+                                )
+                                .build(),
+                        )
+                        .build(),
+                )
+                .build(),
+        )
+        .build();
+    let folder = Path::new("tests/specification/examples/full/");
+    let sk_data = read_signalk_from_file(folder.join("signalk-depth-alarm.json"));
+    assert_eq!(sk_data, expected);
+}
+
+
+#[test]
+fn test_sample_depth_meta_attr() {
+    let expected = V1RootFormat::builder()
+        .version("1.0.0".into())
+        .self_("urn:mrn:signalk:uuid:b7590868-1d62-47d9-989c-32321b349fb9".into())
+        .add_vessel(
+            "urn:mrn:signalk:uuid:b7590868-1d62-47d9-989c-32321b349fb9".into(),
+            V1Vessel::builder()
+                .uuid("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
+                .environment(V1Environment::builder()
+                    .depth(V1EnvironmentDepth::builder()
+                        .below_keel(V1NumberValue::builder()
+                            .value(3.4)
+                            .timestamp("2015-03-06T16:57:53.643Z".into())
+                            .source("nmea1.II".into())
+                            .build())
+                        .build())
+                    .build())
+                .build(),
+        ).build();
+    let folder = Path::new("tests/specification/examples/full/");
+    let sk_data = read_signalk_from_file(folder.join("signalk-depth-meta-attr.json"));
+    assert_eq!(sk_data, expected);
+}
+
