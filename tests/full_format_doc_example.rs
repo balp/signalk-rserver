@@ -3,7 +3,12 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 
-use signalk_rserver::signalk::{V1ACBus, V1Attr, V1CommonValueFields, V1Electrical, V1ElectricalACQualities, V1ElectricalIdentity, V1Environment, V1EnvironmentDepth, V1EnvironmentTime, V1Navigation, V1Notification, V1NotificationValue, V1NumberValue, V1PositionType, V1PositionValue, V1Propulsion, V1RootFormat, V1Source, V1SourceProperty, V1Sources, V1Vessel};
+use signalk_rserver::signalk::{
+    V1ACBus, V1Attr, V1CommonValueFields, V1Electrical, V1ElectricalACQualities,
+    V1ElectricalIdentity, V1Environment, V1EnvironmentDepth, V1EnvironmentTime, V1Navigation,
+    V1Notification, V1NotificationValue, V1NumberValue, V1PositionType, V1PositionValue,
+    V1Propulsion, V1RootFormat, V1Source, V1SourceProperty, V1Sources, V1Vessel,
+};
 
 trait OptionExt {
     type Value;
@@ -428,196 +433,288 @@ fn test_sample_electrical_full() {
                 .uuid("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
                 .electrical(
                     V1Electrical::builder()
-                        .add_ac("bus1".into(), V1ACBus::builder()
-                            .identity(V1ElectricalIdentity::builder()
-                                .name("Primary AC Bus".into())
-                                .location("Engine Room".into())
-                                .date_installed("2010-01-17T00:00:00Z".into())
-                                .build())
-                            .add_phase("A".into(), V1ElectricalACQualities::builder()
-                                .line_line_voltage(V1NumberValue::builder()
-                                    .value(480.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .line_neutral_voltage(V1NumberValue::builder()
-                                    .value(277.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .frequency(V1NumberValue::builder()
-                                    .value(60.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .build())
-                            .add_phase("B".into(), V1ElectricalACQualities::builder()
-                                .line_line_voltage(V1NumberValue::builder()
-                                    .value(480.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .line_neutral_voltage(V1NumberValue::builder()
-                                    .value(277.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .frequency(V1NumberValue::builder()
-                                    .value(60.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .build())
-                            .add_phase("C".into(), V1ElectricalACQualities::builder()
-                                .line_line_voltage(V1NumberValue::builder()
-                                    .value(480.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .line_neutral_voltage(V1NumberValue::builder()
-                                    .value(277.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .frequency(V1NumberValue::builder()
-                                    .value(60.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .build())
-                            .build())
-                        .add_ac("utility".into(), V1ACBus::builder()
-                            .identity(V1ElectricalIdentity::default())
-                            .add_phase("A".into(), V1ElectricalACQualities::builder()
-                                .line_line_voltage(V1NumberValue::builder()
-                                    .value(480.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .line_neutral_voltage(V1NumberValue::builder()
-                                    .value(277.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .frequency(V1NumberValue::builder()
-                                    .value(60.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .current(V1NumberValue::builder()
-                                    .value(10.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .reactive_power(V1NumberValue::builder()
-                                    .value(5000.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .power_factor(V1NumberValue::builder()
-                                    .value(0.97)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .power_factor_lagging("leading".into())
-                                .real_power(V1NumberValue::builder()
-                                    .value(10500.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .apparent_power(V1NumberValue::builder()
-                                    .value(10500.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .build())
-                            .add_phase("B".into(), V1ElectricalACQualities::builder()
-                                .line_line_voltage(V1NumberValue::builder()
-                                    .value(480.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .line_neutral_voltage(V1NumberValue::builder()
-                                    .value(277.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .frequency(V1NumberValue::builder()
-                                    .value(60.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .current(V1NumberValue::builder()
-                                    .value(10.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .reactive_power(V1NumberValue::builder()
-                                    .value(5000.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .power_factor(V1NumberValue::builder()
-                                    .value(0.97)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .power_factor_lagging("leading".into())
-                                .real_power(V1NumberValue::builder()
-                                    .value(10500.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .apparent_power(V1NumberValue::builder()
-                                    .value(10500.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .build())
-                            .add_phase("C".into(), V1ElectricalACQualities::builder()
-                                .line_line_voltage(V1NumberValue::builder()
-                                    .value(480.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .line_neutral_voltage(V1NumberValue::builder()
-                                    .value(277.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .frequency(V1NumberValue::builder()
-                                    .value(60.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .current(V1NumberValue::builder()
-                                    .value(10.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .reactive_power(V1NumberValue::builder()
-                                    .value(5000.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .power_factor(V1NumberValue::builder()
-                                    .value(0.97)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .power_factor_lagging("leading".into())
-                                .real_power(V1NumberValue::builder()
-                                    .value(10500.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .apparent_power(V1NumberValue::builder()
-                                    .value(10500.0)
-                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                    .source("sources.ac_monitor_01".into())
-                                    .build())
-                                .build())
-                            .build())
+                        .add_ac(
+                            "bus1".into(),
+                            V1ACBus::builder()
+                                .identity(
+                                    V1ElectricalIdentity::builder()
+                                        .name("Primary AC Bus".into())
+                                        .location("Engine Room".into())
+                                        .date_installed("2010-01-17T00:00:00Z".into())
+                                        .build(),
+                                )
+                                .add_phase(
+                                    "A".into(),
+                                    V1ElectricalACQualities::builder()
+                                        .line_line_voltage(
+                                            V1NumberValue::builder()
+                                                .value(480.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .line_neutral_voltage(
+                                            V1NumberValue::builder()
+                                                .value(277.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .frequency(
+                                            V1NumberValue::builder()
+                                                .value(60.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .build(),
+                                )
+                                .add_phase(
+                                    "B".into(),
+                                    V1ElectricalACQualities::builder()
+                                        .line_line_voltage(
+                                            V1NumberValue::builder()
+                                                .value(480.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .line_neutral_voltage(
+                                            V1NumberValue::builder()
+                                                .value(277.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .frequency(
+                                            V1NumberValue::builder()
+                                                .value(60.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .build(),
+                                )
+                                .add_phase(
+                                    "C".into(),
+                                    V1ElectricalACQualities::builder()
+                                        .line_line_voltage(
+                                            V1NumberValue::builder()
+                                                .value(480.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .line_neutral_voltage(
+                                            V1NumberValue::builder()
+                                                .value(277.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .frequency(
+                                            V1NumberValue::builder()
+                                                .value(60.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .build(),
+                                )
+                                .build(),
+                        )
+                        .add_ac(
+                            "utility".into(),
+                            V1ACBus::builder()
+                                .identity(V1ElectricalIdentity::default())
+                                .add_phase(
+                                    "A".into(),
+                                    V1ElectricalACQualities::builder()
+                                        .line_line_voltage(
+                                            V1NumberValue::builder()
+                                                .value(480.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .line_neutral_voltage(
+                                            V1NumberValue::builder()
+                                                .value(277.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .frequency(
+                                            V1NumberValue::builder()
+                                                .value(60.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .current(
+                                            V1NumberValue::builder()
+                                                .value(10.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .reactive_power(
+                                            V1NumberValue::builder()
+                                                .value(5000.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .power_factor(
+                                            V1NumberValue::builder()
+                                                .value(0.97)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .power_factor_lagging("leading".into())
+                                        .real_power(
+                                            V1NumberValue::builder()
+                                                .value(10500.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .apparent_power(
+                                            V1NumberValue::builder()
+                                                .value(10500.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .build(),
+                                )
+                                .add_phase(
+                                    "B".into(),
+                                    V1ElectricalACQualities::builder()
+                                        .line_line_voltage(
+                                            V1NumberValue::builder()
+                                                .value(480.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .line_neutral_voltage(
+                                            V1NumberValue::builder()
+                                                .value(277.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .frequency(
+                                            V1NumberValue::builder()
+                                                .value(60.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .current(
+                                            V1NumberValue::builder()
+                                                .value(10.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .reactive_power(
+                                            V1NumberValue::builder()
+                                                .value(5000.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .power_factor(
+                                            V1NumberValue::builder()
+                                                .value(0.97)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .power_factor_lagging("leading".into())
+                                        .real_power(
+                                            V1NumberValue::builder()
+                                                .value(10500.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .apparent_power(
+                                            V1NumberValue::builder()
+                                                .value(10500.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .build(),
+                                )
+                                .add_phase(
+                                    "C".into(),
+                                    V1ElectricalACQualities::builder()
+                                        .line_line_voltage(
+                                            V1NumberValue::builder()
+                                                .value(480.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .line_neutral_voltage(
+                                            V1NumberValue::builder()
+                                                .value(277.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .frequency(
+                                            V1NumberValue::builder()
+                                                .value(60.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .current(
+                                            V1NumberValue::builder()
+                                                .value(10.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .reactive_power(
+                                            V1NumberValue::builder()
+                                                .value(5000.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .power_factor(
+                                            V1NumberValue::builder()
+                                                .value(0.97)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .power_factor_lagging("leading".into())
+                                        .real_power(
+                                            V1NumberValue::builder()
+                                                .value(10500.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .apparent_power(
+                                            V1NumberValue::builder()
+                                                .value(10500.0)
+                                                .timestamp("2014-04-10T08:33:53Z".into())
+                                                .source("sources.ac_monitor_01".into())
+                                                .build(),
+                                        )
+                                        .build(),
+                                )
+                                .build(),
+                        )
                         .build(),
                 )
                 .build(),
@@ -688,15 +785,19 @@ fn test_sample_depth_alarm() {
                                         .add_child(
                                             "belowKeel".into(),
                                             V1Notification::builder()
-                                                .value(V1NotificationValue::builder()
-                                                    .message("Running aground!".into())
-                                                    .state("alarm".into())
-                                                    .method("sound".into())
-                                                    .build())
-                                                .common_value_fields(V1CommonValueFields::builder()
-                                                    .timestamp("2014-04-10T08:33:53Z".into())
-                                                    .source("nmea1.II".into())
-                                                    .build())
+                                                .value(
+                                                    V1NotificationValue::builder()
+                                                        .message("Running aground!".into())
+                                                        .state("alarm".into())
+                                                        .method("sound".into())
+                                                        .build(),
+                                                )
+                                                .common_value_fields(
+                                                    V1CommonValueFields::builder()
+                                                        .timestamp("2014-04-10T08:33:53Z".into())
+                                                        .source("nmea1.II".into())
+                                                        .build(),
+                                                )
                                                 .build(),
                                         )
                                         .build(),
@@ -713,7 +814,6 @@ fn test_sample_depth_alarm() {
     assert_eq!(sk_data, expected);
 }
 
-
 #[test]
 fn test_sample_depth_meta_attr() {
     let expected = V1RootFormat::builder()
@@ -723,23 +823,28 @@ fn test_sample_depth_meta_attr() {
             "urn:mrn:signalk:uuid:b7590868-1d62-47d9-989c-32321b349fb9".into(),
             V1Vessel::builder()
                 .uuid("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
-                .environment(V1Environment::builder()
-                    .depth(V1EnvironmentDepth::builder()
-                        .below_keel(V1NumberValue::builder()
-                            .value(3.4)
-                            .timestamp("2015-03-06T16:57:53.643Z".into())
-                            .source("nmea1.II".into())
-                            .build())
-                        .build())
-                    .build())
+                .environment(
+                    V1Environment::builder()
+                        .depth(
+                            V1EnvironmentDepth::builder()
+                                .below_keel(
+                                    V1NumberValue::builder()
+                                        .value(3.4)
+                                        .timestamp("2015-03-06T16:57:53.643Z".into())
+                                        .source("nmea1.II".into())
+                                        .build(),
+                                )
+                                .build(),
+                        )
+                        .build(),
+                )
                 .build(),
-        ).build();
+        )
+        .build();
     let folder = Path::new("tests/specification/examples/full/");
     let sk_data = read_signalk_from_file(folder.join("signalk-depth-meta-attr.json"));
     assert_eq!(sk_data, expected);
 }
-
-
 
 #[test]
 fn test_sample_vessel_time() {
@@ -750,21 +855,27 @@ fn test_sample_vessel_time() {
             "urn:mrn:signalk:uuid:b7590868-1d62-47d9-989c-32321b349fb9".into(),
             V1Vessel::builder()
                 .uuid("urn:mrn:signalk:uuid:b7590868-1d62-47d9-989c-32321b349fb9".into())
-                .environment(V1Environment::builder()
-                    .time(V1EnvironmentTime::builder()
-                        .millis(1449648657735)
-                        .timezone_offset(-1300)
-                        .timestamp("2014-04-10T08:33:53Z".into())
-                        .source(V1Source::builder()
-                            .label("Realtime clock".into())
-                            .type_("system".into())
-                            .build())
-                        .build())
-                    .build())
+                .environment(
+                    V1Environment::builder()
+                        .time(
+                            V1EnvironmentTime::builder()
+                                .millis(1449648657735)
+                                .timezone_offset(-1300)
+                                .timestamp("2014-04-10T08:33:53Z".into())
+                                .source(
+                                    V1Source::builder()
+                                        .label("Realtime clock".into())
+                                        .type_("system".into())
+                                        .build(),
+                                )
+                                .build(),
+                        )
+                        .build(),
+                )
                 .build(),
-        ).build();
+        )
+        .build();
     let folder = Path::new("tests/specification/examples/full/");
     let sk_data = read_signalk_from_file(folder.join("vessel-time.json"));
     assert_eq!(sk_data, expected);
 }
-

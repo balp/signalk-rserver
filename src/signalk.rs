@@ -583,7 +583,6 @@ impl V1NotificationValueBuilder {
     }
 }
 
-
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1Environment {
     pub outside: Option<V1EnvironmentOutside>,
@@ -719,11 +718,17 @@ impl V1EnvironmentOutsideBuilder {
         self.dew_point_temperature = Some(value);
         self
     }
-    pub fn apparent_wind_chill_temperature(mut self, value: V1NumberValue) -> V1EnvironmentOutsideBuilder {
+    pub fn apparent_wind_chill_temperature(
+        mut self,
+        value: V1NumberValue,
+    ) -> V1EnvironmentOutsideBuilder {
         self.apparent_wind_chill_temperature = Some(value);
         self
     }
-    pub fn theoretical_wind_chill_temperature(mut self, value: V1NumberValue) -> V1EnvironmentOutsideBuilder {
+    pub fn theoretical_wind_chill_temperature(
+        mut self,
+        value: V1NumberValue,
+    ) -> V1EnvironmentOutsideBuilder {
         self.theoretical_wind_chill_temperature = Some(value);
         self
     }
@@ -793,7 +798,6 @@ impl V1EnvironmentInsideBuilder {
         V1EnvironmentInside { zones: self.zones }
     }
 }
-
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 #[serde(rename_all = "camelCase")]
@@ -882,7 +886,10 @@ pub struct V1EnvironmentWater {
 
 impl V1EnvironmentWater {
     pub fn new(temperature: Option<V1NumberValue>, salinity: Option<V1NumberValue>) -> Self {
-        Self { temperature, salinity }
+        Self {
+            temperature,
+            salinity,
+        }
     }
 }
 
@@ -1010,11 +1017,11 @@ impl V1EnvironmentTime {
 }
 #[derive(Default)]
 pub struct V1EnvironmentTimeBuilder {
-     millis: Option<i64>,
-     timezone_offset: Option<i64>,
-     timezone_region: Option<String>,
-     timestamp: Option<String>,
-     source: Option<V1Source>,
+    millis: Option<i64>,
+    timezone_offset: Option<i64>,
+    timezone_region: Option<String>,
+    timestamp: Option<String>,
+    source: Option<V1Source>,
 }
 
 impl V1EnvironmentTimeBuilder {
@@ -1056,7 +1063,6 @@ pub struct V1EnvironmentMode {
     pub timestamp: Option<String>,
     pub source: Option<String>,
 }
-
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1Electrical {
@@ -1593,11 +1599,20 @@ pub struct V1BatteryTemperature {
 }
 
 impl V1BatteryTemperature {
-    pub fn new(limit_discharge_lower: Option<f64>, limit_discharge_upper: Option<f64>, limit_recharge_lower: Option<f64>, limit_recharge_upper: Option<f64>) -> Self {
-        Self { limit_discharge_lower, limit_discharge_upper, limit_recharge_lower, limit_recharge_upper }
+    pub fn new(
+        limit_discharge_lower: Option<f64>,
+        limit_discharge_upper: Option<f64>,
+        limit_recharge_lower: Option<f64>,
+        limit_recharge_upper: Option<f64>,
+    ) -> Self {
+        Self {
+            limit_discharge_lower,
+            limit_discharge_upper,
+            limit_recharge_lower,
+            limit_recharge_upper,
+        }
     }
 }
-
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 #[serde(rename_all = "camelCase")]
@@ -1781,8 +1796,18 @@ pub struct V1Inverter {
 }
 
 impl V1Inverter {
-    pub fn new(identity: Option<V1ElectricalIdentity>, dc: Option<V1ElectricalDCQualities>, ac: Option<V1ElectricalACQualities>, inverter_mode: Option<V1ElectricalInverterMode>) -> Self {
-        Self { identity, dc, ac, inverter_mode }
+    pub fn new(
+        identity: Option<V1ElectricalIdentity>,
+        dc: Option<V1ElectricalDCQualities>,
+        ac: Option<V1ElectricalACQualities>,
+        inverter_mode: Option<V1ElectricalInverterMode>,
+    ) -> Self {
+        Self {
+            identity,
+            dc,
+            ac,
+            inverter_mode,
+        }
     }
 }
 
@@ -1797,8 +1822,16 @@ pub struct V1Charger {
 }
 
 impl V1Charger {
-    pub fn new(identity: Option<V1ElectricalIdentity>, dc: Option<V1ElectricalDCQualities>, charger: Option<V1ElectricalChargerQualities>) -> Self {
-        Self { identity, dc, charger }
+    pub fn new(
+        identity: Option<V1ElectricalIdentity>,
+        dc: Option<V1ElectricalDCQualities>,
+        charger: Option<V1ElectricalChargerQualities>,
+    ) -> Self {
+        Self {
+            identity,
+            dc,
+            charger,
+        }
     }
 }
 
@@ -2013,7 +2046,6 @@ impl V1ACBusBuilder {
         }
     }
 }
-
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1CommonValueFields {
