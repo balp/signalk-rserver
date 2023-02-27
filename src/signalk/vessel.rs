@@ -34,7 +34,6 @@ pub struct V1Vessel {
 
     // pub registrations: Option<HashMap<String, V1Registration>>,
     // pub communication: Option<V1Communication>,
-
     /// Environmental data measured locally including Depth, Wind, Temp, etc.
     pub environment: Option<V1Environment>,
 
@@ -50,7 +49,6 @@ pub struct V1Vessel {
     // pub sails: Option<V1Sails>,
     // pub sensors: Option<V1Sensors>,
     // pub performance: Option<V1Performance>,
-
     /// Engine data, each engine identified by a unique name i.e. Port_Engine
     pub propulsion: Option<HashMap<String, V1Propulsion>>,
 }

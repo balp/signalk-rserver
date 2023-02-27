@@ -21,7 +21,6 @@ pub struct V1FullFormat {
     // TODO: Add aircraft
     // TODO: Add aton
     // TODO: Add sar
-
     /// Metadata about the data sources; physical interface, address, protocol, etc.
     pub sources: Option<V1Sources>,
 }
