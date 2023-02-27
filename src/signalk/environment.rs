@@ -1,7 +1,7 @@
+use crate::signalk::definitions::{V1CommonValueFields, V1NumberValue};
 use crate::signalk::sources::V1Source;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use crate::signalk::definitions::{V1CommonValueFields, V1NumberValue};
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1Environment {

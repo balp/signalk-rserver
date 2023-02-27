@@ -1,29 +1,29 @@
+mod definitions;
+mod electrical;
 mod environment;
 mod navigation;
 mod notification;
 mod propulsion;
-mod vessel;
-mod electrical;
-mod definitions;
 mod sources;
+mod vessel;
 
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 pub use definitions::V1CommonValueFields;
 pub use definitions::V1NumberValue;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 // TODO: Look over if needed...
+pub use definitions::{V1Attr, V1Meta};
+pub use electrical::{V1ACBus, V1Electrical, V1ElectricalACQualities, V1ElectricalIdentity};
 pub use environment::{
     V1Environment, V1EnvironmentCurrent, V1EnvironmentCurrentValue, V1EnvironmentDepth,
-    V1EnvironmentInside, V1EnvironmentTime
+    V1EnvironmentInside, V1EnvironmentTime,
 };
-pub use electrical::{V1ACBus, V1Electrical, V1ElectricalACQualities, V1ElectricalIdentity};
 pub use navigation::{V1Navigation, V1PositionType, V1PositionValue};
 pub use notification::{V1Notification, V1NotificationValue};
 pub use propulsion::V1Propulsion;
 pub use sources::{V1Source, V1SourceProperty, V1Sources};
 pub use vessel::V1Vessel;
-pub use definitions::{V1Attr, V1Meta};
 
 /// Root structure for Full Signal K data
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]

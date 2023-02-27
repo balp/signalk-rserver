@@ -1,6 +1,6 @@
+use crate::signalk::{V1FullFormat, V1FullFormatBuilder, V1Sources, V1Vessel};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use crate::signalk::{V1FullFormat, V1FullFormatBuilder, V1Sources, V1Vessel};
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1CommonValueFields {
@@ -206,4 +206,3 @@ impl V1Attr {
         }
     }
 }
-

@@ -1,6 +1,6 @@
+use crate::signalk::definitions::V1Attr;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use crate::signalk::definitions::V1Attr;
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1Sources {
@@ -133,4 +133,3 @@ impl V1SourcePropertyBuilder {
         }
     }
 }
-

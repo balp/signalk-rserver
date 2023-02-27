@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
 
+use crate::signalk::electrical::V1Electrical;
 use crate::signalk::environment::V1Environment;
 use crate::signalk::notification::V1Notification;
 use crate::signalk::{V1Navigation, V1Propulsion};
 use std::collections::HashMap;
-use crate::signalk::electrical::V1Electrical;
 
 /// An object describing an individual vessel. It should be an object in vessels,
 /// named using MMSI or a UUID
