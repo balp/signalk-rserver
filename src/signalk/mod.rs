@@ -146,3 +146,93 @@ impl V1HelloBuilder {
         }
     }
 }
+
+/// Root structure for Delta Signal K data
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+pub struct V1DeltaFormat {
+    pub context: Option<String>,
+    pub updates: Vec<V1UpdateType>,
+}
+
+impl V1DeltaFormat {
+    pub fn builder() -> V1DeltaFormatBuilder { V1DeltaFormatBuilder::default() }
+}
+
+#[derive(Default)]
+pub struct V1DeltaFormatBuilder {
+    pub context: Option<String>,
+    pub updates: Vec<V1UpdateType>,
+}
+
+impl V1DeltaFormatBuilder {
+    pub fn context(mut self, vaule: String) -> V1DeltaFormatBuilder {
+        self.context = Some(vaule);
+        self
+    }
+    pub fn add(mut self, value: V1UpdateType) -> V1DeltaFormatBuilder {
+        self.updates.push(value);
+        self
+    }
+    pub fn build(self) -> V1DeltaFormat {
+        V1DeltaFormat { context: self.context, updates: self.updates }
+    }
+}
+
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+pub struct V1UpdateType {
+    pub values: Vec<V1UpdateValue>,
+    #[serde(rename = "$source")]
+    pub ref_source: Option<String>,
+}
+
+impl V1UpdateType {
+    pub fn builder() -> V1UpdateTypeBuilder {
+        V1UpdateTypeBuilder::default()
+    }
+}
+
+#[derive(Default)]
+pub struct V1UpdateTypeBuilder {
+    values: Vec<V1UpdateValue>,
+    ref_source: Option<String>,
+}
+
+impl V1UpdateTypeBuilder {
+    pub fn add(mut self, value: V1UpdateValue) -> V1UpdateTypeBuilder {
+        self.values.push(value);
+        self
+    }
+    pub fn ref_source(mut self, value: String) -> V1UpdateTypeBuilder {
+        self.ref_source = Some(value);
+        self
+    }
+    pub fn build(self) -> V1UpdateType {
+        V1UpdateType { values: self.values, ref_source: self.ref_source }
+    }
+}
+
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+pub struct V1UpdateValue {
+    pub path: String,
+    pub value: serde_json::value::Value,
+}
+
+impl V1UpdateValue {
+    pub fn new(path: String, value: serde_json::value::Value) -> Self {
+        Self { path, value }
+    }
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[serde(untagged)]
+pub enum V1UpdateValueType {
+    String(String),
+    Number(f64),
+    Bool(bool),
+    Object(serde_json::value::Value),
+    #[default]
+    None,
+}
+
