@@ -1,32 +1,48 @@
+mod vessel;
+
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
+pub use vessel::V1Vessel;
 
+/// Root structure for Full Signal K data
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
-pub struct V1RootFormat {
+pub struct V1FullFormat {
+    /// Version of the schema and APIs that this data is using in Canonical format i.e. V1.7.0.
     pub version: String,
+
+    /// This holds the context (prefix + UUID, MMSI or URL in dot notation) of the server's self object.
     #[serde(rename = "self")]
     pub self_: String,
+
+    /// A wrapper object for vessel objects, each describing vessels in range, including this vessel.
     pub vessels: Option<HashMap<String, V1Vessel>>,
+
+    // TODO: Add aircraft
+    // TODO: Add aton
+    // TODO: Add sar
+
+    /// Metadata about the data sources; physical interface, address, protocol, etc.
     pub sources: Option<V1Sources>,
 }
 
-impl V1RootFormat {
-    pub fn builder() -> V1RootFormatBuilder {
-        V1RootFormatBuilder::default()
+impl V1FullFormat {
+    /// Returs a builder for the Full Formal Signal K structure
+    pub fn builder() -> V1FullFormatBuilder {
+        V1FullFormatBuilder::default()
     }
 }
 
-pub struct V1RootFormatBuilder {
+pub struct V1FullFormatBuilder {
     version: String,
     self_: String,
     vessels: Option<HashMap<String, V1Vessel>>,
     sources: Option<V1Sources>,
 }
 
-impl Default for V1RootFormatBuilder {
+impl Default for V1FullFormatBuilder {
     fn default() -> Self {
-        V1RootFormatBuilder {
+        V1FullFormatBuilder {
             version: "1.7.0".to_string(),
             self_: "".to_string(),
             vessels: None,
@@ -35,16 +51,16 @@ impl Default for V1RootFormatBuilder {
     }
 }
 
-impl V1RootFormatBuilder {
-    pub fn version(mut self, version: String) -> V1RootFormatBuilder {
+impl V1FullFormatBuilder {
+    pub fn version(mut self, version: String) -> V1FullFormatBuilder {
         self.version = version;
         self
     }
-    pub fn self_(mut self, self_: String) -> V1RootFormatBuilder {
+    pub fn self_(mut self, self_: String) -> V1FullFormatBuilder {
         self.self_ = self_;
         self
     }
-    pub fn add_vessel(mut self, key: String, vessel: V1Vessel) -> V1RootFormatBuilder {
+    pub fn add_vessel(mut self, key: String, vessel: V1Vessel) -> V1FullFormatBuilder {
         if self.vessels.is_none() {
             self.vessels = Some(HashMap::new());
         }
@@ -53,135 +69,16 @@ impl V1RootFormatBuilder {
         }
         self
     }
-    pub fn sources(mut self, sources: V1Sources) -> V1RootFormatBuilder {
+    pub fn sources(mut self, sources: V1Sources) -> V1FullFormatBuilder {
         self.sources = Some(sources);
         self
     }
-    pub fn build(self) -> V1RootFormat {
-        V1RootFormat {
+    pub fn build(self) -> V1FullFormat {
+        V1FullFormat {
             version: self.version,
             self_: self.self_,
             vessels: self.vessels,
             sources: self.sources,
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct V1Vessel {
-    pub mmsi: Option<String>,
-    pub url: Option<String>,
-    pub uuid: Option<String>,
-    pub mothership_mmsi: Option<String>,
-    pub name: Option<String>,
-    pub port: Option<String>,
-    pub flag: Option<String>,
-    pub navigation: Option<V1Navigation>,
-    // pub registrations: Option<HashMap<String, V1Registration>>,
-    // pub communication: Option<V1Communication>,
-    pub environment: Option<V1Environment>,
-    pub electrical: Option<V1Electrical>,
-    pub notifications: Option<V1Notification>,
-    // pub steering: Option<V1Steering>,
-    // pub tanks: Option<V1Tanks>,
-    // pub design: Option<V1Design>,
-    // pub sails: Option<V1Sails>,
-    // pub sensors: Option<V1Sensors>,
-    // pub performance: Option<V1Performance>,
-    pub propulsion: Option<HashMap<String, V1Propulsion>>,
-}
-
-impl V1Vessel {
-    pub fn builder() -> V1VesselBuilder {
-        V1VesselBuilder::default()
-    }
-}
-
-#[derive(Default)]
-pub struct V1VesselBuilder {
-    mmsi: Option<String>,
-    url: Option<String>,
-    uuid: Option<String>,
-    mothership_mmsi: Option<String>,
-    name: Option<String>,
-    flag: Option<String>,
-    port: Option<String>,
-    navigation: Option<V1Navigation>,
-    environment: Option<V1Environment>,
-    electrical: Option<V1Electrical>,
-    notifications: Option<V1Notification>,
-    propulsion: Option<HashMap<String, V1Propulsion>>,
-}
-
-impl V1VesselBuilder {
-    pub fn uuid(mut self, value: String) -> V1VesselBuilder {
-        self.uuid = Some(value);
-        self
-    }
-    pub fn url(mut self, value: String) -> V1VesselBuilder {
-        self.url = Some(value);
-        self
-    }
-    pub fn mmsi(mut self, value: String) -> V1VesselBuilder {
-        self.mmsi = Some(value);
-        self
-    }
-    pub fn mothership_mmsi(mut self, value: String) -> V1VesselBuilder {
-        self.mothership_mmsi = Some(value);
-        self
-    }
-    pub fn name(mut self, value: String) -> V1VesselBuilder {
-        self.name = Some(value);
-        self
-    }
-    pub fn port(mut self, value: String) -> V1VesselBuilder {
-        self.port = Some(value);
-        self
-    }
-    pub fn flag(mut self, value: String) -> V1VesselBuilder {
-        self.flag = Some(value);
-        self
-    }
-    pub fn navigation(mut self, value: V1Navigation) -> V1VesselBuilder {
-        self.navigation = Some(value);
-        self
-    }
-    pub fn electrical(mut self, value: V1Electrical) -> V1VesselBuilder {
-        self.electrical = Some(value);
-        self
-    }
-    pub fn environment(mut self, value: V1Environment) -> V1VesselBuilder {
-        self.environment = Some(value);
-        self
-    }
-    pub fn notifications(mut self, value: V1Notification) -> V1VesselBuilder {
-        self.notifications = Some(value);
-        self
-    }
-    pub fn add_propulsion(mut self, key: String, value: V1Propulsion) -> V1VesselBuilder {
-        if self.propulsion.is_none() {
-            self.propulsion = Some(HashMap::new());
-        }
-        if let Some(ref mut x) = self.propulsion {
-            x.insert(key, value);
-        }
-        self
-    }
-    pub fn build(self) -> V1Vessel {
-        V1Vessel {
-            uuid: self.uuid,
-            mmsi: self.mmsi,
-            name: self.name,
-            port: self.port,
-            flag: self.flag,
-            navigation: self.navigation,
-            environment: self.environment,
-            electrical: self.electrical,
-            notifications: self.notifications,
-            propulsion: self.propulsion,
-            url: self.url,
-            mothership_mmsi: self.mothership_mmsi,
         }
     }
 }
