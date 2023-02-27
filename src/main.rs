@@ -7,7 +7,7 @@ use serde_json::json;
 mod signalk;
 
 #[get("/signalk/v1/api/")]
-async fn signalk_v1(data: web::Data<signalk::V1RootFormat>) -> Result<impl Responder> {
+async fn signalk_v1(data: web::Data<signalk::V1FullFormat>) -> Result<impl Responder> {
     Ok(web::Json(data))
 }
 
@@ -34,7 +34,7 @@ async fn main() -> std::io::Result<()> {
     let self_link = format!("vessels.urn:mrn:signalk:uuid:{self_uuid}");
     HttpServer::new(|| {
         App::new()
-            .app_data(web::Data::new(signalk::V1RootFormat {
+            .app_data(web::Data::new(signalk::V1FullFormat {
                 // vessels: signalk::V1VesselFormat{ mmsi: "826512345".to_string()},
                 version: "1.7.0".to_string(),
                 self_: "vessels.urn:mrn:signalk:uuid:d6d08b72-88e2-4911-9429-ede4d5819549"

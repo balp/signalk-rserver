@@ -5,9 +5,9 @@ use std::path::{Path, PathBuf};
 
 use signalk_rserver::signalk::{
     V1ACBus, V1Attr, V1CommonValueFields, V1Electrical, V1ElectricalACQualities,
-    V1ElectricalIdentity, V1Environment, V1EnvironmentDepth, V1EnvironmentTime, V1Navigation,
-    V1Notification, V1NotificationValue, V1NumberValue, V1PositionType, V1PositionValue,
-    V1Propulsion, V1RootFormat, V1Source, V1SourceProperty, V1Sources, V1Vessel,
+    V1ElectricalIdentity, V1Environment, V1EnvironmentDepth, V1EnvironmentTime, V1FullFormat,
+    V1Navigation, V1Notification, V1NotificationValue, V1NumberValue, V1PositionType,
+    V1PositionValue, V1Propulsion, V1Source, V1SourceProperty, V1Sources, V1Vessel,
 };
 
 trait OptionExt {
@@ -22,16 +22,16 @@ impl<T> OptionExt for Option<T> {
     }
 }
 
-fn read_signalk_from_file(path: PathBuf) -> V1RootFormat {
+fn read_signalk_from_file(path: PathBuf) -> V1FullFormat {
     let file = File::open(path).unwrap();
     let reader = BufReader::new(file);
-    let sk_data: V1RootFormat = serde_json::from_reader(reader).unwrap();
+    let sk_data: V1FullFormat = serde_json::from_reader(reader).unwrap();
     sk_data
 }
 
 #[test]
 fn test_sample_full_0183_rmc_export() {
-    let expected = V1RootFormat::builder()
+    let expected = V1FullFormat::builder()
         .version("1.0.0".into())
         .self_("urn:mrn:imo:mmsi:366982330".into())
         .add_vessel(
@@ -66,7 +66,7 @@ fn test_sample_full_0183_rmc_export() {
 
 #[test]
 fn test_sample_docs_full_example() {
-    let expected = V1RootFormat::builder()
+    let expected = V1FullFormat::builder()
         .version("1.0.0".into())
         .self_("urn:mrn:signalk:uuid:705f5f1a-efaf-44aa-9cb8-a0fd6305567c".into())
         .add_vessel(
@@ -138,7 +138,7 @@ fn test_sample_docs_full_example() {
 
 #[test]
 fn test_sample_full_0183_rmc_export_min() {
-    let expected = V1RootFormat::builder()
+    let expected = V1FullFormat::builder()
         .version("1.0.0".into())
         .self_("urn:mrn:imo:mmsi:366982330".into())
         .add_vessel(
@@ -174,7 +174,7 @@ fn test_sample_full_0183_rmc_export_min() {
 
 #[test]
 fn test_sample_full_0183_rmc_full() {
-    let expected = V1RootFormat::builder()
+    let expected = V1FullFormat::builder()
         .version("0.1.0".into())
         .self_("urn:mrn:imo:mmsi:366982330".into())
         .add_vessel(
@@ -209,7 +209,7 @@ fn test_sample_full_0183_rmc_full() {
 
 #[test]
 fn test_sample_docs_data_model() {
-    let expected = V1RootFormat::builder()
+    let expected = V1FullFormat::builder()
         .version("1.0.0".into())
         .self_("urn:mrn:signalk:uuid:705f5f1a-efaf-44aa-9cb8-a0fd6305567c".into())
         .add_vessel(
@@ -280,7 +280,7 @@ fn test_sample_docs_data_model() {
 
 #[test]
 fn test_sample_docs_data_model_metadata() {
-    let expected = V1RootFormat::builder()
+    let expected = V1FullFormat::builder()
         .version("1.0.0".into())
         .self_("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
         .add_vessel(
@@ -310,7 +310,7 @@ fn test_sample_docs_data_model_metadata() {
 
 #[test]
 fn test_sample_docs_data_model_multiple_values_metadata() {
-    let expected = V1RootFormat::builder()
+    let expected = V1FullFormat::builder()
         .version("0.9.0".into())
         .self_("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
         .add_vessel(
@@ -338,7 +338,7 @@ fn test_sample_docs_data_model_multiple_values_metadata() {
 
 #[test]
 fn test_sample_docs_notifications() {
-    let expected = V1RootFormat::builder()
+    let expected = V1FullFormat::builder()
         .version("1.0.0".into())
         .self_("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
         .add_vessel(
@@ -424,7 +424,7 @@ fn test_sample_docs_notifications() {
 
 #[test]
 fn test_sample_electrical_full() {
-    let expected = V1RootFormat::builder()
+    let expected = V1FullFormat::builder()
         .version("1.0.0".into())
         .self_("urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
         .add_vessel(
@@ -727,7 +727,7 @@ fn test_sample_electrical_full() {
 
 #[test]
 fn test_sample_mob_alarm() {
-    let expected = V1RootFormat::builder()
+    let expected = V1FullFormat::builder()
         .version("1.0.0".into())
         .self_("urn:mrn:imo:mmsi:366982330".into())
         .add_vessel(
@@ -767,7 +767,7 @@ fn test_sample_mob_alarm() {
 
 #[test]
 fn test_sample_depth_alarm() {
-    let expected = V1RootFormat::builder()
+    let expected = V1FullFormat::builder()
         .version("1.0.0".into())
         .self_("urn:mrn:signalk:uuid:b7590868-1d62-47d9-989c-32321b349fb9".into())
         .add_vessel(
@@ -816,7 +816,7 @@ fn test_sample_depth_alarm() {
 
 #[test]
 fn test_sample_depth_meta_attr() {
-    let expected = V1RootFormat::builder()
+    let expected = V1FullFormat::builder()
         .version("1.0.0".into())
         .self_("urn:mrn:signalk:uuid:b7590868-1d62-47d9-989c-32321b349fb9".into())
         .add_vessel(
@@ -848,7 +848,7 @@ fn test_sample_depth_meta_attr() {
 
 #[test]
 fn test_sample_vessel_time() {
-    let expected = V1RootFormat::builder()
+    let expected = V1FullFormat::builder()
         .version("1.0.0".into())
         .self_("urn:mrn:signalk:uuid:b7590868-1d62-47d9-989c-32321b349fb9".into())
         .add_vessel(
