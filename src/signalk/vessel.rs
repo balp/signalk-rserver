@@ -1,35 +1,57 @@
-
-
 use serde::{Deserialize, Serialize};
 
 use crate::signalk::{V1Electrical, V1Environment, V1Navigation, V1Notification, V1Propulsion};
 use std::collections::HashMap;
-
 
 /// An object describing an individual vessel. It should be an object in vessels,
 /// named using MMSI or a UUID
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct V1Vessel {
+    /// MMSI number of the vessel, if available.
     pub mmsi: Option<String>,
+
+    /// URL based identity of the vessel, if available.
     pub url: Option<String>,
+
+    /// A unique Signal K flavoured maritime resource identifier, assigned by the server.
     pub uuid: Option<String>,
+
+    /// MMSI number of the mothership of this vessel, if available.
     pub mothership_mmsi: Option<String>,
+
+    /// The common name of the vessel
     pub name: Option<String>,
+
+    /// The home port of the vessel
     pub port: Option<String>,
+
+    /// The country of ship registration, or flag state of the vessel
     pub flag: Option<String>,
+
+    /// Navigation data including Position, Course to next WP information, etc.
     pub navigation: Option<V1Navigation>,
+
     // pub registrations: Option<HashMap<String, V1Registration>>,
     // pub communication: Option<V1Communication>,
+
+    /// Environmental data measured locally including Depth, Wind, Temp, etc.
     pub environment: Option<V1Environment>,
+
+    /// Electrical data, each electrical device indentified by a unique name i.e. Battery_1
     pub electrical: Option<V1Electrical>,
+
+    /// Notifications currently raised. Major categories have well-defined names, but the tree can be extended by any hierarchical structure
     pub notifications: Option<V1Notification>,
+
     // pub steering: Option<V1Steering>,
     // pub tanks: Option<V1Tanks>,
     // pub design: Option<V1Design>,
     // pub sails: Option<V1Sails>,
     // pub sensors: Option<V1Sensors>,
     // pub performance: Option<V1Performance>,
+
+    /// Engine data, each engine identified by a unique name i.e. Port_Engine
     pub propulsion: Option<HashMap<String, V1Propulsion>>,
 }
 

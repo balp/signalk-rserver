@@ -27,12 +27,16 @@ pub struct V1FullFormat {
 }
 
 impl V1FullFormat {
-    /// Returs a builder for the Full Formal Signal K structure
+    /// Returns a builder for the Full Formal Signal K structure
+    ///
+    /// As the structure is a bit complex to create it's recommended to
+    ///use this builder pattern to create new instances.
     pub fn builder() -> V1FullFormatBuilder {
         V1FullFormatBuilder::default()
     }
 }
 
+/// Builder for the Signal K Full format structure
 pub struct V1FullFormatBuilder {
     version: String,
     self_: String,
