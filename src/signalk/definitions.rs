@@ -1,6 +1,7 @@
 use crate::signalk::{V1FullFormat, V1FullFormatBuilder, V1Sources, V1Vessel};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use serde_json::{Number, Value};
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1CommonValueFields {
@@ -206,3 +207,19 @@ impl V1Attr {
         }
     }
 }
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct V1DefSource {
+    pub label: String,
+    #[serde(rename = "type")]
+    pub type_: Option<String>,
+    pub src: Option<String>,
+    pub can_name: Option<String>,
+    pub pgn: Option<Number>,
+    pub instance: Option<String>,
+    pub sentence: Option<String>,
+    pub talker: Option<String>,
+    pub ais_type: Option<Number>,
+}
+

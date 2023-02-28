@@ -1,19 +1,10 @@
-mod definitions;
-mod electrical;
-mod environment;
-mod navigation;
-mod notification;
-mod propulsion;
-mod sources;
-mod vessel;
-
-pub use definitions::V1CommonValueFields;
-pub use definitions::V1NumberValue;
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+use serde::{Deserialize, Serialize};
+
 // TODO: Look over if needed...
-pub use definitions::{V1Attr, V1Meta};
+pub use definitions::{V1Attr, V1Meta, V1CommonValueFields, V1NumberValue, V1DefSource};
+
 pub use electrical::{V1ACBus, V1Electrical, V1ElectricalACQualities, V1ElectricalIdentity};
 pub use environment::{
     V1Environment, V1EnvironmentCurrent, V1EnvironmentCurrentValue, V1EnvironmentDepth,
@@ -24,6 +15,15 @@ pub use notification::{V1Notification, V1NotificationValue};
 pub use propulsion::V1Propulsion;
 pub use sources::{V1Source, V1SourceProperty, V1Sources};
 pub use vessel::V1Vessel;
+
+mod definitions;
+mod electrical;
+mod environment;
+mod navigation;
+mod notification;
+mod propulsion;
+mod sources;
+mod vessel;
 
 /// Root structure for Full Signal K data
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
@@ -181,9 +181,11 @@ impl V1DeltaFormatBuilder {
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1UpdateType {
-    pub values: Vec<V1UpdateValue>,
+    pub values: Option<Vec<V1UpdateValue>>,
     #[serde(rename = "$source")]
     pub ref_source: Option<String>,
+    pub source: Option<V1DefSource>,
+    pub timestamp: Option<String>,
 }
 
 impl V1UpdateType {
@@ -194,21 +196,37 @@ impl V1UpdateType {
 
 #[derive(Default)]
 pub struct V1UpdateTypeBuilder {
-    values: Vec<V1UpdateValue>,
+    values: Option<Vec<V1UpdateValue>>,
     ref_source: Option<String>,
+    source: Option<V1DefSource>,
+    timestamp: Option<String>,
+
 }
 
 impl V1UpdateTypeBuilder {
     pub fn add(mut self, value: V1UpdateValue) -> V1UpdateTypeBuilder {
-        self.values.push(value);
+        if self.values.is_none() {
+            self.values = Some(Vec::new());
+        }
+        if let Some(ref mut x) = self.values {
+            x.push(value);
+        }
         self
     }
     pub fn ref_source(mut self, value: String) -> V1UpdateTypeBuilder {
         self.ref_source = Some(value);
         self
     }
+    pub fn source(mut self, value: V1DefSource) -> V1UpdateTypeBuilder {
+        self.source = Some(value);
+        self
+    }
+    pub fn timestamp(mut self, value: String) -> V1UpdateTypeBuilder {
+        self.timestamp = Some(value);
+        self
+    }
     pub fn build(self) -> V1UpdateType {
-        V1UpdateType { values: self.values, ref_source: self.ref_source }
+        V1UpdateType { values: self.values, ref_source: self.ref_source, source: self.source, timestamp: self.timestamp }
     }
 }
 
