@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
+
 use serde_json::Number;
 
 use signalk_rserver::signalk::{V1DefSource, V1DeltaFormat, V1UpdateType, V1UpdateValue, V1UpdateValueType};
@@ -69,20 +70,36 @@ fn test_docs_data_model() {
     let expected = V1DeltaFormat::builder()
         .context("vessels.urn:mrn:imo:mmsi:234567890".into())
         .add(V1UpdateType::builder()
-            .source(V1DefSource::default())
-
+            .source(V1DefSource::builder()
+                .label("N2000-01".into())
+                .type_("NMEA2000".into())
+                .src("017".into())
+                .pgn(127488)
+                .build())
             .add(V1UpdateValue::new("propulsion.0.revolutions".into(), serde_json::value::Value::Number(Number::from_f64(16.341667).unwrap())))
             .add(V1UpdateValue::new("propulsion.0.boostPressure".into(), serde_json::value::Value::Number(Number::from_f64(45500.0).unwrap())))
             .timestamp("2010-01-07T07:18:44Z".into())
             .build())
-         .add(V1UpdateType::builder()
+        .add(V1UpdateType::builder()
+            .source(V1DefSource::builder()
+                .label("N2000-01".into())
+                .type_("NMEA2000".into())
+                .src("115".into())
+                .pgn(128267)
+                .build())
             .add(V1UpdateValue::new("navigation.courseOverGroundTrue".into(), serde_json::value::Value::Number(Number::from_f64(2.971).unwrap())))
             .add(V1UpdateValue::new("navigation.speedOverGround".into(), serde_json::value::Value::Number(Number::from_f64(3.85).unwrap())))
-             .timestamp("2014-08-15T16:00:00.081Z".into())
+            .timestamp("2014-08-15T16:00:00.081Z".into())
             .build())
-         .add(V1UpdateType::builder()
+        .add(V1UpdateType::builder()
+            .source(V1DefSource::builder()
+                .label("N2000-01".into())
+                .type_("NMEA2000".into())
+                .src("115".into())
+                .pgn(128267)
+                .build())
             .add(V1UpdateValue::new("".into(), serde_json::value::Value::Object(map)))
-             .timestamp("2014-08-15T19:02:31.507Z".into())
+            .timestamp("2014-08-15T19:02:31.507Z".into())
             .build())
         .build();
     assert_eq!(sk_data, expected)

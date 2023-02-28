@@ -1,7 +1,9 @@
-use crate::signalk::{V1FullFormat, V1FullFormatBuilder, V1Sources, V1Vessel};
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+
+use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};
+
+use crate::signalk::{V1FullFormat, V1FullFormatBuilder, V1Sources, V1Vessel};
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1CommonValueFields {
@@ -216,10 +218,80 @@ pub struct V1DefSource {
     pub type_: Option<String>,
     pub src: Option<String>,
     pub can_name: Option<String>,
-    pub pgn: Option<Number>,
+    pub pgn: Option<i32>,
     pub instance: Option<String>,
     pub sentence: Option<String>,
     pub talker: Option<String>,
-    pub ais_type: Option<Number>,
+    pub ais_type: Option<i32>,
 }
 
+impl V1DefSource {
+    pub fn builder() -> V1DefSourceBuilder {
+        V1DefSourceBuilder::default()
+    }
+}
+
+#[derive(Default)]
+pub struct V1DefSourceBuilder {
+    label: String,
+    type_: Option<String>,
+    src: Option<String>,
+    can_name: Option<String>,
+    pgn: Option<i32>,
+    instance: Option<String>,
+    sentence: Option<String>,
+    talker: Option<String>,
+    ais_type: Option<i32>,
+}
+
+impl V1DefSourceBuilder {
+    pub fn label(mut self, value: String) -> V1DefSourceBuilder {
+        self.label = value;
+        self
+    }
+    pub fn type_(mut self, value: String) -> V1DefSourceBuilder {
+        self.type_ = Some(value);
+        self
+    }
+    pub fn src(mut self, value: String) -> V1DefSourceBuilder {
+        self.src = Some(value);
+        self
+    }
+    pub fn can_name(mut self, value: String) -> V1DefSourceBuilder {
+        self.can_name = Some(value);
+        self
+    }
+    pub fn pgn(mut self, value: i32) -> V1DefSourceBuilder {
+        self.pgn = Some(value);
+        self
+    }
+    pub fn instance(mut self, value: String) -> V1DefSourceBuilder {
+        self.instance = Some(value);
+        self
+    }
+    pub fn sentence(mut self, value: String) -> V1DefSourceBuilder {
+        self.sentence = Some(value);
+        self
+    }
+    pub fn talker(mut self, value: String) -> V1DefSourceBuilder {
+        self.talker = Some(value);
+        self
+    }
+    pub fn ais_type(mut self, value: i32) -> V1DefSourceBuilder {
+        self.ais_type = Some(value);
+        self
+    }
+    pub fn build(self) -> V1DefSource {
+        V1DefSource {
+            label: self.label,
+            type_: self.type_,
+            src: self.src,
+            can_name: self.can_name,
+            pgn: self.pgn,
+            instance: self.instance,
+            sentence: self.sentence,
+            talker: self.talker,
+            ais_type: self.ais_type,
+        }
+    }
+}
