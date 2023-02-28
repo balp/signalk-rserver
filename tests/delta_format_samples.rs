@@ -5,7 +5,10 @@ use std::path::{Path, PathBuf};
 
 use serde_json::Number;
 
-use signalk_rserver::signalk::{V1DefSource, V1DeltaFormat, V1UpdateType, V1UpdateValue, V1UpdateValueType};
+use signalk_rserver::signalk::{
+    V1DefSource, V1DeltaFormat, V1Meta, V1MetaZone, V1UpdateMeta, V1UpdateType, V1UpdateValue,
+    V1UpdateValueType,
+};
 
 trait OptionExt {
     type Value;
@@ -32,16 +35,35 @@ fn test_0183_rmc_export_delta() {
     let sk_data = read_signalk_from_file(folder.join("0183-RMC-export-delta.json"));
     let expected = V1DeltaFormat::builder()
         .context("vessels.366982330.navigation".into())
-        .add(V1UpdateType::builder()
-            .add(V1UpdateValue::new("position.timestamp".into(),
-                                    serde_json::value::Value::String("2015-03-07T12:37:10.523+13:00".into())))
-            .add(V1UpdateValue::new("position.longitude".into(), serde_json::value::Value::Number(Number::from_f64(173.1693).unwrap())))
-            .add(V1UpdateValue::new("position.latitude".into(), serde_json::value::Value::Number(Number::from_f64(-41.156426).unwrap())))
-            .add(V1UpdateValue::new("position.source".into(), serde_json::value::Value::String("sources.gps_0183_RMC".into())))
-            .add(V1UpdateValue::new("position.altitude".into(), serde_json::value::Value::Number(Number::from(0))))
-            .add(V1UpdateValue::new("courseOverGroundTrue".into(), serde_json::value::Value::Number(Number::from_f64(245.69).unwrap())))
-            .ref_source("sources.gps_0183_RMC".into())
-            .build())
+        .add_update(
+            V1UpdateType::builder()
+                .add(V1UpdateValue::new(
+                    "position.timestamp".into(),
+                    serde_json::value::Value::String("2015-03-07T12:37:10.523+13:00".into()),
+                ))
+                .add(V1UpdateValue::new(
+                    "position.longitude".into(),
+                    serde_json::value::Value::Number(Number::from_f64(173.1693).unwrap()),
+                ))
+                .add(V1UpdateValue::new(
+                    "position.latitude".into(),
+                    serde_json::value::Value::Number(Number::from_f64(-41.156426).unwrap()),
+                ))
+                .add(V1UpdateValue::new(
+                    "position.source".into(),
+                    serde_json::value::Value::String("sources.gps_0183_RMC".into()),
+                ))
+                .add(V1UpdateValue::new(
+                    "position.altitude".into(),
+                    serde_json::value::Value::Number(Number::from(0)),
+                ))
+                .add(V1UpdateValue::new(
+                    "courseOverGroundTrue".into(),
+                    serde_json::value::Value::Number(Number::from_f64(245.69).unwrap()),
+                ))
+                .ref_source("sources.gps_0183_RMC".into())
+                .build(),
+        )
         .build();
     assert_eq!(sk_data, expected)
 }
@@ -52,12 +74,26 @@ fn test_0183_rmc_export_min_delta() {
     let sk_data = read_signalk_from_file(folder.join("0183-RMC-export-min-delta.json"));
     let expected = V1DeltaFormat::builder()
         .context("vessels.366982330.navigation".into())
-        .add(V1UpdateType::builder()
-            .add(V1UpdateValue::new("position.longitude".into(), serde_json::value::Value::Number(Number::from_f64(173.1693).unwrap())))
-            .add(V1UpdateValue::new("position.latitude".into(), serde_json::value::Value::Number(Number::from_f64(-41.156426).unwrap())))
-            .add(V1UpdateValue::new("position.altitude".into(), serde_json::value::Value::Number(Number::from(0))))
-            .add(V1UpdateValue::new("courseOverGroundTrue".into(), serde_json::value::Value::Number(Number::from_f64(245.69).unwrap())))
-            .build())
+        .add_update(
+            V1UpdateType::builder()
+                .add(V1UpdateValue::new(
+                    "position.longitude".into(),
+                    serde_json::value::Value::Number(Number::from_f64(173.1693).unwrap()),
+                ))
+                .add(V1UpdateValue::new(
+                    "position.latitude".into(),
+                    serde_json::value::Value::Number(Number::from_f64(-41.156426).unwrap()),
+                ))
+                .add(V1UpdateValue::new(
+                    "position.altitude".into(),
+                    serde_json::value::Value::Number(Number::from(0)),
+                ))
+                .add(V1UpdateValue::new(
+                    "courseOverGroundTrue".into(),
+                    serde_json::value::Value::Number(Number::from_f64(245.69).unwrap()),
+                ))
+                .build(),
+        )
         .build();
     assert_eq!(sk_data, expected)
 }
@@ -66,41 +102,71 @@ fn test_0183_rmc_export_min_delta() {
 fn test_docs_data_model() {
     let folder = Path::new("tests/specification/examples/delta/");
     let sk_data = read_signalk_from_file(folder.join("docs-data_model.json"));
-    let map = serde_json::Map::from_iter([("name".to_string(), serde_json::value::Value::String("WRANGO".into()))]);
+    let map = serde_json::Map::from_iter([(
+        "name".to_string(),
+        serde_json::value::Value::String("WRANGO".into()),
+    )]);
     let expected = V1DeltaFormat::builder()
         .context("vessels.urn:mrn:imo:mmsi:234567890".into())
-        .add(V1UpdateType::builder()
-            .source(V1DefSource::builder()
-                .label("N2000-01".into())
-                .type_("NMEA2000".into())
-                .src("017".into())
-                .pgn(127488)
-                .build())
-            .add(V1UpdateValue::new("propulsion.0.revolutions".into(), serde_json::value::Value::Number(Number::from_f64(16.341667).unwrap())))
-            .add(V1UpdateValue::new("propulsion.0.boostPressure".into(), serde_json::value::Value::Number(Number::from_f64(45500.0).unwrap())))
-            .timestamp("2010-01-07T07:18:44Z".into())
-            .build())
-        .add(V1UpdateType::builder()
-            .source(V1DefSource::builder()
-                .label("N2000-01".into())
-                .type_("NMEA2000".into())
-                .src("115".into())
-                .pgn(128267)
-                .build())
-            .add(V1UpdateValue::new("navigation.courseOverGroundTrue".into(), serde_json::value::Value::Number(Number::from_f64(2.971).unwrap())))
-            .add(V1UpdateValue::new("navigation.speedOverGround".into(), serde_json::value::Value::Number(Number::from_f64(3.85).unwrap())))
-            .timestamp("2014-08-15T16:00:00.081Z".into())
-            .build())
-        .add(V1UpdateType::builder()
-            .source(V1DefSource::builder()
-                .label("N2000-01".into())
-                .type_("NMEA2000".into())
-                .src("115".into())
-                .pgn(128267)
-                .build())
-            .add(V1UpdateValue::new("".into(), serde_json::value::Value::Object(map)))
-            .timestamp("2014-08-15T19:02:31.507Z".into())
-            .build())
+        .add_update(
+            V1UpdateType::builder()
+                .source(
+                    V1DefSource::builder()
+                        .label("N2000-01".into())
+                        .type_("NMEA2000".into())
+                        .src("017".into())
+                        .pgn(127488)
+                        .build(),
+                )
+                .add(V1UpdateValue::new(
+                    "propulsion.0.revolutions".into(),
+                    serde_json::value::Value::Number(Number::from_f64(16.341667).unwrap()),
+                ))
+                .add(V1UpdateValue::new(
+                    "propulsion.0.boostPressure".into(),
+                    serde_json::value::Value::Number(Number::from_f64(45500.0).unwrap()),
+                ))
+                .timestamp("2010-01-07T07:18:44Z".into())
+                .build(),
+        )
+        .add_update(
+            V1UpdateType::builder()
+                .source(
+                    V1DefSource::builder()
+                        .label("N2000-01".into())
+                        .type_("NMEA2000".into())
+                        .src("115".into())
+                        .pgn(128267)
+                        .build(),
+                )
+                .add(V1UpdateValue::new(
+                    "navigation.courseOverGroundTrue".into(),
+                    serde_json::value::Value::Number(Number::from_f64(2.971).unwrap()),
+                ))
+                .add(V1UpdateValue::new(
+                    "navigation.speedOverGround".into(),
+                    serde_json::value::Value::Number(Number::from_f64(3.85).unwrap()),
+                ))
+                .timestamp("2014-08-15T16:00:00.081Z".into())
+                .build(),
+        )
+        .add_update(
+            V1UpdateType::builder()
+                .source(
+                    V1DefSource::builder()
+                        .label("N2000-01".into())
+                        .type_("NMEA2000".into())
+                        .src("115".into())
+                        .pgn(128267)
+                        .build(),
+                )
+                .add(V1UpdateValue::new(
+                    "".into(),
+                    serde_json::value::Value::Object(map),
+                ))
+                .timestamp("2014-08-15T19:02:31.507Z".into())
+                .build(),
+        )
         .build();
     assert_eq!(sk_data, expected)
 }
@@ -109,13 +175,27 @@ fn test_docs_data_model() {
 fn test_docs_data_model_meta_deltas() {
     let folder = Path::new("tests/specification/examples/delta/");
     let sk_data = read_signalk_from_file(folder.join("docs-data_model_meta_deltas.json"));
-    let map = serde_json::Map::from_iter([("name".to_string(), serde_json::value::Value::String("WRANGO".into()))]);
     let expected = V1DeltaFormat::builder()
-        .add(V1UpdateType::builder()
-            .timestamp("2014-08-15T19:02:31.507Z".into())
-            .build())
+        .add_update(
+            V1UpdateType::builder()
+                .meta(V1UpdateMeta::new(
+                    "environment.wind.speedApparent".into(),
+                    V1Meta::builder()
+                        .description("Apparent wind speed".into())
+                        .display_name("Apparent Wind Speed".into())
+                        .short_name("AWS".into())
+                        .units("m/s".into())
+                        .zones(V1MetaZone::builder()
+                            .upper(15.4333)
+                            .state("warn".into())
+                            .message("high wind speed".into())
+                            .build())
+                        .build(),
+                ))
+                .timestamp("2014-08-15T19:02:31.507Z".into())
+                .build(),
+        )
         .context("vessels.urn:mrn:imo:mmsi:234567890".into())
         .build();
     assert_eq!(sk_data, expected)
 }
-

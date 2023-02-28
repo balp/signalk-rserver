@@ -3,8 +3,7 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
 // TODO: Look over if needed...
-pub use definitions::{V1Attr, V1Meta, V1CommonValueFields, V1NumberValue, V1DefSource};
-
+pub use definitions::{V1Attr, V1CommonValueFields, V1DefSource, V1Meta, V1MetaZone, V1NumberValue};
 pub use electrical::{V1ACBus, V1Electrical, V1ElectricalACQualities, V1ElectricalIdentity};
 pub use environment::{
     V1Environment, V1EnvironmentCurrent, V1EnvironmentCurrentValue, V1EnvironmentDepth,
@@ -85,7 +84,6 @@ pub struct V1Hello {
     #[serde(rename = "self")]
     pub self_: Option<String>,
     pub roles: Vec<String>,
-
 }
 
 impl V1Hello {
@@ -155,7 +153,9 @@ pub struct V1DeltaFormat {
 }
 
 impl V1DeltaFormat {
-    pub fn builder() -> V1DeltaFormatBuilder { V1DeltaFormatBuilder::default() }
+    pub fn builder() -> V1DeltaFormatBuilder {
+        V1DeltaFormatBuilder::default()
+    }
 }
 
 #[derive(Default)]
@@ -169,19 +169,22 @@ impl V1DeltaFormatBuilder {
         self.context = Some(vaule);
         self
     }
-    pub fn add(mut self, value: V1UpdateType) -> V1DeltaFormatBuilder {
+    pub fn add_update(mut self, value: V1UpdateType) -> V1DeltaFormatBuilder {
         self.updates.push(value);
         self
     }
     pub fn build(self) -> V1DeltaFormat {
-        V1DeltaFormat { context: self.context, updates: self.updates }
+        V1DeltaFormat {
+            context: self.context,
+            updates: self.updates,
+        }
     }
 }
-
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1UpdateType {
     pub values: Option<Vec<V1UpdateValue>>,
+    pub meta: Option<Vec<V1UpdateMeta>>,
     #[serde(rename = "$source")]
     pub ref_source: Option<String>,
     pub source: Option<V1DefSource>,
@@ -197,10 +200,10 @@ impl V1UpdateType {
 #[derive(Default)]
 pub struct V1UpdateTypeBuilder {
     values: Option<Vec<V1UpdateValue>>,
+    meta: Option<Vec<V1UpdateMeta>>,
     ref_source: Option<String>,
     source: Option<V1DefSource>,
     timestamp: Option<String>,
-
 }
 
 impl V1UpdateTypeBuilder {
@@ -209,6 +212,15 @@ impl V1UpdateTypeBuilder {
             self.values = Some(Vec::new());
         }
         if let Some(ref mut x) = self.values {
+            x.push(value);
+        }
+        self
+    }
+    pub fn meta(mut self, value: V1UpdateMeta) -> V1UpdateTypeBuilder {
+        if self.meta.is_none() {
+            self.meta = Some(Vec::new());
+        }
+        if let Some(ref mut x) = self.meta {
             x.push(value);
         }
         self
@@ -226,10 +238,15 @@ impl V1UpdateTypeBuilder {
         self
     }
     pub fn build(self) -> V1UpdateType {
-        V1UpdateType { values: self.values, ref_source: self.ref_source, source: self.source, timestamp: self.timestamp }
+        V1UpdateType {
+            values: self.values,
+            meta: self.meta,
+            ref_source: self.ref_source,
+            source: self.source,
+            timestamp: self.timestamp,
+        }
     }
 }
-
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1UpdateValue {
@@ -254,3 +271,14 @@ pub enum V1UpdateValueType {
     None,
 }
 
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+pub struct V1UpdateMeta {
+    pub path: String,
+    pub value: V1Meta,
+}
+
+impl V1UpdateMeta {
+    pub fn new(path: String, value: V1Meta) -> Self {
+        Self { path, value }
+    }
+}

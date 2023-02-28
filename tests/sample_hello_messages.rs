@@ -6,8 +6,8 @@ use std::path::{Path, PathBuf};
 use signalk_rserver::signalk::{
     V1ACBus, V1Attr, V1CommonValueFields, V1Electrical, V1ElectricalACQualities,
     V1ElectricalIdentity, V1Environment, V1EnvironmentDepth, V1EnvironmentTime, V1FullFormat,
-    V1Navigation, V1Notification, V1NotificationValue, V1NumberValue, V1PositionType,
-    V1PositionValue, V1Propulsion, V1Source, V1SourceProperty, V1Sources, V1Vessel, V1Hello
+    V1Hello, V1Navigation, V1Notification, V1NotificationValue, V1NumberValue, V1PositionType,
+    V1PositionValue, V1Propulsion, V1Source, V1SourceProperty, V1Sources, V1Vessel,
 };
 
 trait OptionExt {
