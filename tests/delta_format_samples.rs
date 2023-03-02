@@ -3,7 +3,8 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 
-use serde_json::Number;
+use serde_json::{json, Number, Value};
+use serde_json::Value::Object;
 
 use signalk_rserver::signalk::{
     V1DefSource, V1DeltaFormat, V1Meta, V1MetaZone, V1UpdateMeta, V1UpdateType, V1UpdateValue,
@@ -196,6 +197,79 @@ fn test_docs_data_model_meta_deltas() {
                 .build(),
         )
         .context("vessels.urn:mrn:imo:mmsi:234567890".into())
+        .build();
+    assert_eq!(sk_data, expected)
+}
+
+#[test]
+fn test_docs_data_model_multiple_values() {
+    let folder = Path::new("tests/specification/examples/delta/");
+    let sk_data = read_signalk_from_file(folder.join("docs-data_model_multiple_values.json"));
+    let expected = V1DeltaFormat::builder()
+        .context("vessels.urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
+        .add_update(
+            V1UpdateType::builder()
+                .timestamp("2017-04-03T06:14:04.451Z".into())
+                .source(V1DefSource::builder()
+                    .label("GPS-1".into())
+                    .type_("NMEA0183".into())
+                    .talker("GP".into())
+                    .sentence("RMC".into())
+                    .build())
+                .add(V1UpdateValue::new("navigation.courseOverGroundTrue".into(), Value::Number(Number::from_f64(3.615624078431440).unwrap())))
+                .build(),
+        )
+        .add_update(
+            V1UpdateType::builder()
+                .timestamp("2017-04-03T06:14:04.451Z".into())
+                .source(V1DefSource::builder()
+                    .label("actisense".into())
+                    .type_("NMEA2000".into())
+                    .src("115".into())
+                    .pgn(128267)
+                    .build())
+                .add(V1UpdateValue::new("navigation.courseOverGroundTrue".into(), Value::Number(Number::from_f64(3.615624078431453).unwrap())))
+                .build(),
+        )
+        .build();
+    assert_eq!(sk_data, expected)
+}
+
+#[test]
+fn test_docs_notifications() {
+    let folder = Path::new("tests/specification/examples/delta/");
+    let sk_data = read_signalk_from_file(folder.join("docs-notifications.json"));
+    let expected = V1DeltaFormat::builder()
+        .context("vessels.urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
+        .add_update(
+            V1UpdateType::builder()
+                .timestamp("2017-08-15T16:00:05.200Z".into())
+                .source(V1DefSource::builder()
+                    .label("ttyUSB0".into())
+                    .type_("NMEA0183".into())
+                    .talker("GP".into())
+                    .sentence("MOB".into())
+                    .build())
+                .add(V1UpdateValue::new("notifications.mob".into(),
+                                        json!({
+                                            "message": "MOB",
+                                            "state": "emergency",
+                                            "method": ["visual", "sound"],
+                                        })))
+                .build(),
+        )
+        .add_update(
+            V1UpdateType::builder()
+                .timestamp("2017-08-15T16:00:05.538Z".into())
+                .source(V1DefSource::builder()
+                    .label("ttyUSB0".into())
+                    .type_("NMEA0183".into())
+                    .talker("GP".into())
+                    .sentence("MOB".into())
+                    .build())
+                .add(V1UpdateValue::new("notifications.mob".into(), Value::Null))
+                .build(),
+        )
         .build();
     assert_eq!(sk_data, expected)
 }
