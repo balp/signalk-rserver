@@ -297,3 +297,30 @@ fn test_docs_subscription_protocol() {
         .build();
     assert_eq!(sk_data, expected)
 }
+
+#[test]
+fn test_MOB_alarm_delta() {
+    let folder = Path::new("tests/specification/examples/delta/");
+    let sk_data = read_signalk_from_file(folder.join("MOB-alarm-delta.json"));
+    let expected = V1DeltaFormat::builder()
+        .context("vessels.urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
+        .add_update(
+            V1UpdateType::builder()
+                .source(V1DefSource::builder()
+                    .label("ttyUSB0".into())
+                    .type_("NMEA0183".into())
+                    .talker("GP".into())
+                    .sentence("MOB".into())
+                    .build())
+                .timestamp("2014-08-15T16:00:05.538Z".into())
+                .add(V1UpdateValue::new("notifications.mob".into(),
+                                        json!({
+                                            "message": "MOB",
+                                            "state": "emergency",
+                                            "method": ["visual", "sound"],
+                                        })))
+                .build(),
+        )
+        .build();
+    assert_eq!(sk_data, expected)
+}
