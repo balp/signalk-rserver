@@ -4,7 +4,7 @@ use std::io::BufReader;
 use std::path::{Path, PathBuf};
 
 use serde_json::{json, Number, Value};
-use serde_json::Value::Object;
+use serde_json::Value::{Object};
 
 use signalk_rserver::signalk::{
     V1DefSource, V1DeltaFormat, V1Meta, V1MetaZone, V1UpdateMeta, V1UpdateType, V1UpdateValue,
@@ -268,6 +268,30 @@ fn test_docs_notifications() {
                     .sentence("MOB".into())
                     .build())
                 .add(V1UpdateValue::new("notifications.mob".into(), Value::Null))
+                .build(),
+        )
+        .build();
+    assert_eq!(sk_data, expected)
+}
+
+#[test]
+fn test_docs_subscription_protocol() {
+    let folder = Path::new("tests/specification/examples/delta/");
+    let sk_data = read_signalk_from_file(folder.join("docs-subscription_protocol.json"));
+    let expected = V1DeltaFormat::builder()
+        .context("vessels.urn:mrn:imo:mmsi:234567890".into())
+        .add_update(
+            V1UpdateType::builder()
+                .source(V1DefSource::builder()
+                    .label("N2000-01".into())
+                    .type_("NMEA2000".into())
+                    .src("115".into())
+                    .pgn(128275)
+                    .build())
+                .add(V1UpdateValue::new("navigation.trip.log".into(),
+                                        json!(43374)))
+                .add(V1UpdateValue::new("navigation.log".into(),
+                                        json!(17404540)))
                 .build(),
         )
         .build();
