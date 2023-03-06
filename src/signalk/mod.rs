@@ -14,7 +14,7 @@ pub use notification::{V1Notification, V1NotificationValue};
 pub use propulsion::V1Propulsion;
 pub use sources::{V1Source, V1SourceProperty, V1Sources};
 pub use vessel::V1Vessel;
-
+pub use discovery::{V1Discovery, V1DiscoveryServer, V1DiscoveryEndpoint};
 mod definitions;
 mod electrical;
 mod environment;
@@ -23,6 +23,7 @@ mod notification;
 mod propulsion;
 mod sources;
 mod vessel;
+mod discovery;
 
 /// Root structure for Full Signal K data
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
