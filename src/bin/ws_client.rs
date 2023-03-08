@@ -1,71 +1,23 @@
 #![allow(clippy::uninlined_format_args)]
 
 // use std::io::Bytes;
-use actix_rt::System;
+// use actix_rt::System;
 use awc::error::WsProtocolError;
-use awc::ws::{Frame, Message};
-use awc::{ws, Client};
-use bytes::{Bytes, BytesMut};
-use futures_util::{sink::SinkExt, stream::StreamExt};
+use awc::ws::Frame;
+use awc::Client;
+use bytes::Bytes;
+use futures_util::stream::StreamExt;
 use serde::Deserialize;
-use serde_json::{json, Value};
+use serde_json::Value;
+use signalk_rserver::signalk::delta::V1DeltaFormat;
+use signalk_rserver::signalk::hello::V1Hello;
 use std::str;
-
-#[derive(Debug, Deserialize)]
-struct SignalKWSHello {
-    name: String,
-    version: String,
-    #[serde(rename = "self")]
-    _self: String,
-    roles: Vec<String>,
-    timestamp: String,
-}
-
-#[derive(Debug, Deserialize)]
-struct SignalKValueUUID {
-    uuid: String,
-}
-
-#[derive(Debug, Deserialize)]
-struct SignalKValuePosition {
-    longitude: f32,
-    latitude: f32,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(untagged)]
-enum SignalKValue {
-    UUID(SignalKValueUUID),
-    Position(SignalKValuePosition),
-}
-
-#[derive(Debug, Deserialize)]
-struct SignalKWSUpdateValue {
-    path: String,
-    value: SignalKValue,
-}
-
-#[derive(Debug, Deserialize)]
-struct SignalKWSUpdateValueGroup {
-    #[serde(rename = "$source")]
-    d_source: String,
-    #[serde(skip)]
-    source: String,
-    timestamp: String,
-    values: Vec<SignalKWSUpdateValue>,
-}
-
-#[derive(Debug, Deserialize)]
-struct SignalKWSDelta {
-    context: String,
-    updates: Vec<SignalKWSUpdateValueGroup>,
-}
 
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
 enum SignalKWSMessage {
-    Hello(SignalKWSHello),
-    Delta(SignalKWSDelta),
+    Hello(V1Hello),
+    Delta(V1DeltaFormat),
     Dummy,
 }
 
@@ -123,7 +75,7 @@ impl SignalKUpdater {
 async fn main() {
     let mut sk_handler = SignalKUpdater::default();
     let (_resp, mut connection) = Client::new()
-        .ws("ws://homenuc:3002/signalk/v1/stream?subscribe=self")
+        .ws("ws://homenuc:3003/signalk/v1/stream?subscribe=self")
         .connect()
         .await
         .unwrap();

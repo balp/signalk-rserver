@@ -1,7 +1,6 @@
-use std::collections::HashMap;
+use serde::{Deserialize, Serialize};
 
 use crate::signalk::definitions::V1NumberValue;
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 #[serde(rename_all = "camelCase")]

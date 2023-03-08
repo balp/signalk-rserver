@@ -1,14 +1,8 @@
-use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 
-use signalk_rserver::signalk::{
-    V1ACBus, V1Attr, V1CommonValueFields, V1Electrical, V1ElectricalACQualities,
-    V1ElectricalIdentity, V1Environment, V1EnvironmentDepth, V1EnvironmentTime, V1FullFormat,
-    V1Hello, V1Navigation, V1Notification, V1NotificationValue, V1NumberValue, V1PositionType,
-    V1PositionValue, V1Propulsion, V1Source, V1SourceProperty, V1Sources, V1Vessel,
-};
+use signalk_rserver::signalk::hello::V1Hello;
 
 trait OptionExt {
     type Value;

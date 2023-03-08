@@ -53,7 +53,6 @@ impl V1UnsubscribeBuilder {
     }
 }
 
-
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct V1Unsubscription {
@@ -101,7 +100,7 @@ impl V1UnsubscriptionBuilder {
         self
     }
     pub fn build(self) -> V1Unsubscription {
-        V1Unsubscription{
+        V1Unsubscription {
             path: self.path,
             period: self.period,
             format: self.format,

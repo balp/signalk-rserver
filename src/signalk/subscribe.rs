@@ -53,7 +53,6 @@ impl V1SubscribeBuilder {
     }
 }
 
-
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct V1Subscription {
@@ -101,7 +100,7 @@ impl V1SubscriptionBuilder {
         self
     }
     pub fn build(self) -> V1Subscription {
-        V1Subscription{
+        V1Subscription {
             path: self.path,
             period: self.period,
             format: self.format,

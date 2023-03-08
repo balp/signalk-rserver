@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
@@ -15,8 +16,8 @@ impl V1Discovery {
 
 #[derive(Default)]
 pub struct V1DiscoveryBuilder {
-     endpoints: HashMap<String, V1DiscoveryEndpoint>,
-     server: V1DiscoveryServer,
+    endpoints: HashMap<String, V1DiscoveryEndpoint>,
+    server: V1DiscoveryServer,
 }
 
 impl V1DiscoveryBuilder {
@@ -29,7 +30,10 @@ impl V1DiscoveryBuilder {
         self
     }
     pub fn build(self) -> V1Discovery {
-        V1Discovery { endpoints: self.endpoints, server: self.server }
+        V1Discovery {
+            endpoints: self.endpoints,
+            server: self.server,
+        }
     }
 }
 
@@ -76,7 +80,7 @@ impl V1DiscoveryEndpointBuilder {
         self
     }
     pub fn build(self) -> V1DiscoveryEndpoint {
-        V1DiscoveryEndpoint{
+        V1DiscoveryEndpoint {
             version: self.version,
             signalk_http: self.signalk_http,
             signalk_ws: self.signalk_ws,

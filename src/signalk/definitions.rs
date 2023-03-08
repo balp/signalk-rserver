@@ -1,9 +1,5 @@
-use std::collections::HashMap;
-
 use serde::{Deserialize, Serialize};
-use serde_json::{Number, Value};
-
-use crate::signalk::{V1FullFormat, V1FullFormatBuilder, V1Sources, V1Vessel};
+use serde_json::Value;
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1CommonValueFields {
@@ -124,38 +120,6 @@ impl V1NumberValueBuilder {
             source: self.source,
             pgn: self.pgn,
             sentence: self.sentence,
-        }
-    }
-}
-
-impl V1FullFormatBuilder {
-    pub fn version(mut self, version: String) -> V1FullFormatBuilder {
-        self.version = version;
-        self
-    }
-    pub fn self_(mut self, self_: String) -> V1FullFormatBuilder {
-        self.self_ = self_;
-        self
-    }
-    pub fn add_vessel(mut self, key: String, vessel: V1Vessel) -> V1FullFormatBuilder {
-        if self.vessels.is_none() {
-            self.vessels = Some(HashMap::new());
-        }
-        if let Some(ref mut x) = self.vessels {
-            x.insert(key, vessel);
-        }
-        self
-    }
-    pub fn sources(mut self, sources: V1Sources) -> V1FullFormatBuilder {
-        self.sources = Some(sources);
-        self
-    }
-    pub fn build(self) -> V1FullFormat {
-        V1FullFormat {
-            version: self.version,
-            self_: self.self_,
-            vessels: self.vessels,
-            sources: self.sources,
         }
     }
 }

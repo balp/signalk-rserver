@@ -1,15 +1,11 @@
-use std::collections::HashMap;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 
 use serde_json::{json, Number, Value};
-use serde_json::Value::{Object};
 
-use signalk_rserver::signalk::{
-    V1DefSource, V1DeltaFormat, V1Meta, V1MetaZone, V1UpdateMeta, V1UpdateType, V1UpdateValue,
-    V1UpdateValueType,
-};
+use signalk_rserver::signalk::delta::{V1DeltaFormat, V1UpdateMeta, V1UpdateType, V1UpdateValue};
+use signalk_rserver::signalk::{V1DefSource, V1Meta, V1MetaZone};
 
 trait OptionExt {
     type Value;
@@ -186,11 +182,13 @@ fn test_docs_data_model_meta_deltas() {
                         .display_name("Apparent Wind Speed".into())
                         .short_name("AWS".into())
                         .units("m/s".into())
-                        .zones(V1MetaZone::builder()
-                            .upper(15.4333)
-                            .state("warn".into())
-                            .message("high wind speed".into())
-                            .build())
+                        .zones(
+                            V1MetaZone::builder()
+                                .upper(15.4333)
+                                .state("warn".into())
+                                .message("high wind speed".into())
+                                .build(),
+                        )
                         .build(),
                 ))
                 .timestamp("2014-08-15T19:02:31.507Z".into())
@@ -210,25 +208,35 @@ fn test_docs_data_model_multiple_values() {
         .add_update(
             V1UpdateType::builder()
                 .timestamp("2017-04-03T06:14:04.451Z".into())
-                .source(V1DefSource::builder()
-                    .label("GPS-1".into())
-                    .type_("NMEA0183".into())
-                    .talker("GP".into())
-                    .sentence("RMC".into())
-                    .build())
-                .add(V1UpdateValue::new("navigation.courseOverGroundTrue".into(), Value::Number(Number::from_f64(3.615624078431440).unwrap())))
+                .source(
+                    V1DefSource::builder()
+                        .label("GPS-1".into())
+                        .type_("NMEA0183".into())
+                        .talker("GP".into())
+                        .sentence("RMC".into())
+                        .build(),
+                )
+                .add(V1UpdateValue::new(
+                    "navigation.courseOverGroundTrue".into(),
+                    Value::Number(Number::from_f64(3.615624078431440).unwrap()),
+                ))
                 .build(),
         )
         .add_update(
             V1UpdateType::builder()
                 .timestamp("2017-04-03T06:14:04.451Z".into())
-                .source(V1DefSource::builder()
-                    .label("actisense".into())
-                    .type_("NMEA2000".into())
-                    .src("115".into())
-                    .pgn(128267)
-                    .build())
-                .add(V1UpdateValue::new("navigation.courseOverGroundTrue".into(), Value::Number(Number::from_f64(3.615624078431453).unwrap())))
+                .source(
+                    V1DefSource::builder()
+                        .label("actisense".into())
+                        .type_("NMEA2000".into())
+                        .src("115".into())
+                        .pgn(128267)
+                        .build(),
+                )
+                .add(V1UpdateValue::new(
+                    "navigation.courseOverGroundTrue".into(),
+                    Value::Number(Number::from_f64(3.615624078431453).unwrap()),
+                ))
                 .build(),
         )
         .build();
@@ -244,29 +252,35 @@ fn test_docs_notifications() {
         .add_update(
             V1UpdateType::builder()
                 .timestamp("2017-08-15T16:00:05.200Z".into())
-                .source(V1DefSource::builder()
-                    .label("ttyUSB0".into())
-                    .type_("NMEA0183".into())
-                    .talker("GP".into())
-                    .sentence("MOB".into())
-                    .build())
-                .add(V1UpdateValue::new("notifications.mob".into(),
-                                        json!({
-                                            "message": "MOB",
-                                            "state": "emergency",
-                                            "method": ["visual", "sound"],
-                                        })))
+                .source(
+                    V1DefSource::builder()
+                        .label("ttyUSB0".into())
+                        .type_("NMEA0183".into())
+                        .talker("GP".into())
+                        .sentence("MOB".into())
+                        .build(),
+                )
+                .add(V1UpdateValue::new(
+                    "notifications.mob".into(),
+                    json!({
+                        "message": "MOB",
+                        "state": "emergency",
+                        "method": ["visual", "sound"],
+                    }),
+                ))
                 .build(),
         )
         .add_update(
             V1UpdateType::builder()
                 .timestamp("2017-08-15T16:00:05.538Z".into())
-                .source(V1DefSource::builder()
-                    .label("ttyUSB0".into())
-                    .type_("NMEA0183".into())
-                    .talker("GP".into())
-                    .sentence("MOB".into())
-                    .build())
+                .source(
+                    V1DefSource::builder()
+                        .label("ttyUSB0".into())
+                        .type_("NMEA0183".into())
+                        .talker("GP".into())
+                        .sentence("MOB".into())
+                        .build(),
+                )
                 .add(V1UpdateValue::new("notifications.mob".into(), Value::Null))
                 .build(),
         )
@@ -282,16 +296,19 @@ fn test_docs_subscription_protocol() {
         .context("vessels.urn:mrn:imo:mmsi:234567890".into())
         .add_update(
             V1UpdateType::builder()
-                .source(V1DefSource::builder()
-                    .label("N2000-01".into())
-                    .type_("NMEA2000".into())
-                    .src("115".into())
-                    .pgn(128275)
-                    .build())
-                .add(V1UpdateValue::new("navigation.trip.log".into(),
-                                        json!(43374)))
-                .add(V1UpdateValue::new("navigation.log".into(),
-                                        json!(17404540)))
+                .source(
+                    V1DefSource::builder()
+                        .label("N2000-01".into())
+                        .type_("NMEA2000".into())
+                        .src("115".into())
+                        .pgn(128275)
+                        .build(),
+                )
+                .add(V1UpdateValue::new(
+                    "navigation.trip.log".into(),
+                    json!(43374),
+                ))
+                .add(V1UpdateValue::new("navigation.log".into(), json!(17404540)))
                 .build(),
         )
         .build();
@@ -299,26 +316,30 @@ fn test_docs_subscription_protocol() {
 }
 
 #[test]
-fn test_MOB_alarm_delta() {
+fn test_mob_alarm_delta() {
     let folder = Path::new("tests/specification/examples/delta/");
     let sk_data = read_signalk_from_file(folder.join("MOB-alarm-delta.json"));
     let expected = V1DeltaFormat::builder()
         .context("vessels.urn:mrn:signalk:uuid:c0d79334-4e25-4245-8892-54e8ccc8021d".into())
         .add_update(
             V1UpdateType::builder()
-                .source(V1DefSource::builder()
-                    .label("ttyUSB0".into())
-                    .type_("NMEA0183".into())
-                    .talker("GP".into())
-                    .sentence("MOB".into())
-                    .build())
+                .source(
+                    V1DefSource::builder()
+                        .label("ttyUSB0".into())
+                        .type_("NMEA0183".into())
+                        .talker("GP".into())
+                        .sentence("MOB".into())
+                        .build(),
+                )
                 .timestamp("2014-08-15T16:00:05.538Z".into())
-                .add(V1UpdateValue::new("notifications.mob".into(),
-                                        json!({
-                                            "message": "MOB",
-                                            "state": "emergency",
-                                            "method": ["visual", "sound"],
-                                        })))
+                .add(V1UpdateValue::new(
+                    "notifications.mob".into(),
+                    json!({
+                        "message": "MOB",
+                        "state": "emergency",
+                        "method": ["visual", "sound"],
+                    }),
+                ))
                 .build(),
         )
         .build();

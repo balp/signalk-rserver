@@ -1,6 +1,8 @@
-use crate::signalk::definitions::V1CommonValueFields;
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+
+use serde::{Deserialize, Serialize};
+
+use crate::signalk::definitions::V1CommonValueFields;
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
 pub struct V1Notification {
