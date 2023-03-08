@@ -15,6 +15,7 @@ pub use propulsion::V1Propulsion;
 pub use sources::{V1Source, V1SourceProperty, V1Sources};
 pub use vessel::V1Vessel;
 pub use discovery::{V1Discovery, V1DiscoveryServer, V1DiscoveryEndpoint};
+pub use put::{V1Put, V1PutValue};
 mod definitions;
 mod electrical;
 mod environment;
@@ -24,6 +25,7 @@ mod propulsion;
 mod sources;
 mod vessel;
 mod discovery;
+mod put;
 
 /// Root structure for Full Signal K data
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
