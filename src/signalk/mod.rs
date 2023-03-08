@@ -17,6 +17,7 @@ pub use vessel::V1Vessel;
 pub use discovery::{V1Discovery, V1DiscoveryServer, V1DiscoveryEndpoint};
 pub use put::{V1Put, V1PutValue};
 pub use subscribe::{V1Subscribe, V1Subscription};
+pub use unsubscribe::{V1Unsubscribe, V1Unsubscription};
 mod definitions;
 mod electrical;
 mod environment;
@@ -28,6 +29,7 @@ mod vessel;
 mod discovery;
 mod put;
 mod subscribe;
+mod unsubscribe;
 
 /// Root structure for Full Signal K data
 #[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
