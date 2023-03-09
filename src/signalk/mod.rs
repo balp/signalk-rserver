@@ -2,8 +2,10 @@
 //!
 //! `signalk` is a collections of types to serialize and deserialize the
 //! signal-k protocol.
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+
+use serde::{Deserialize, Serialize};
+use serde_json::value::Value;
 
 pub use definitions::{
     V1Attr, V1CommonValueFields, V1DefSource, V1Meta, V1MetaZone, V1NumberValue,
@@ -65,15 +67,25 @@ impl Storage {
         }
 
         if let Some(ref mut x) = self.data.vessels {
-            x.insert("urn:mrn:imo:mmsi:366982330".into(),
-                     V1Vessel::builder()
-                         .mmsi("366982330".into())
-                         .navigation(V1Navigation::builder()
-                             .speed_over_ground(V1NumberValue::builder()
-                                 .value(5.6)
-                                 .build())
-                             .build())
-                         .build());
+            if let Some(ref first_update) = delta.updates.get(0) {
+                if let Some(ref values) = first_update.values {
+                    if let Some(ref value) = values.get(0) {
+                        if let Value::Number(ref new_value) = value.value {
+                            if let Some(f64_number) = new_value.as_f64() {
+                                x.insert("urn:mrn:imo:mmsi:366982330".into(),
+                                         V1Vessel::builder()
+                                             .mmsi("366982330".into())
+                                             .navigation(V1Navigation::builder()
+                                                 .speed_over_ground(V1NumberValue::builder()
+                                                     .value(f64_number)
+                                                     .build())
+                                                 .build())
+                                             .build());
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
     pub fn get(&self) -> V1FullFormat { // TODO: Implement this
@@ -87,6 +99,7 @@ impl Storage {
 #[cfg(test)]
 mod storage_tests {
     use serde_json::{Number, Value};
+
     use crate::signalk::{Storage, V1DeltaFormat, V1FullFormat, V1Navigation, V1NumberValue, V1UpdateType, V1UpdateValue, V1Vessel};
 
     #[test]
@@ -97,7 +110,7 @@ mod storage_tests {
     }
 
     #[test]
-    fn apply_delta_for_sog() {
+    fn apply_delta_for_sog_5_6() {
         let mut storage = Storage::default();
         let expected = V1FullFormat::builder()
             .add_vessel("urn:mrn:imo:mmsi:366982330".into(), V1Vessel::builder()
@@ -110,11 +123,32 @@ mod storage_tests {
         let delta = V1DeltaFormat::builder()
             .context("vessels.urn:mrn:imo:mmsi:366982330".into())
             .add_update(V1UpdateType::builder().add(
-                V1UpdateValue::new("navigation.speedOverGround".into(),Value::Number(Number::from_f64(5.6).unwrap())))
+                V1UpdateValue::new("navigation.speedOverGround".into(), Value::Number(Number::from_f64(5.6).unwrap())))
                 .build())
             .build();
         storage.update(delta);
         assert_eq!(expected, storage.get())
+    }
 
+    #[test]
+    fn apply_delta_for_sog_15_8() {
+        let mut storage = Storage::default();
+        let expected = V1FullFormat::builder()
+            .add_vessel("urn:mrn:imo:mmsi:366982330".into(), V1Vessel::builder()
+                .mmsi("366982330".into())
+                .navigation(V1Navigation::builder()
+                    .speed_over_ground(V1NumberValue::builder().value(15.8).build())
+                    .build())
+                .build())
+            .build();
+        let delta = V1DeltaFormat::builder()
+            .context("vessels.urn:mrn:imo:mmsi:366982330".into())
+            .add_update(V1UpdateType::builder().add(
+                V1UpdateValue::new("navigation.speedOverGround".into(), Value::Number(Number::from_f64(15.8).unwrap())))
+                .build())
+            .build();
+        storage.update(delta);
+        assert_eq!(expected, storage.get())
     }
 }
+
