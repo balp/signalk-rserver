@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::signalk::{V1Sources, V1Vessel};
 
 /// Root structure for Full Signal K data
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct V1FullFormat {
     /// Version of the schema and APIs that this data is using in Canonical format i.e. V1.7.0.
     pub version: String,
@@ -22,6 +22,17 @@ pub struct V1FullFormat {
     // TODO: Add sar
     /// Metadata about the data sources; physical interface, address, protocol, etc.
     pub sources: Option<V1Sources>,
+}
+
+impl Default for V1FullFormat {
+    fn default() -> Self {
+        V1FullFormat {
+            version: "1.7.0".to_string(),
+            self_: "".to_string(),
+            vessels: None,
+            sources: None,
+        }
+    }
 }
 
 impl V1FullFormat {

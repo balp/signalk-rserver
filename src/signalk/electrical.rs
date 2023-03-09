@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::signalk::definitions::{V1CommonValueFields, V1NumberValue};
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct V1Electrical {
     pub batteries: Option<HashMap<String, V1Battery>>,
     pub inverters: Option<HashMap<String, V1Inverter>>,
@@ -98,7 +98,7 @@ impl V1ElectricalBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1ElectricalIdentity {
     pub name: Option<String>,
@@ -148,7 +148,7 @@ impl V1ElectricalIdentityBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct V1ElectricalManufacturer {
     pub name: Option<String>,
     pub model: Option<String>,
@@ -191,7 +191,7 @@ impl V1ElectricalManufacturerBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1ElectricalDCQualities {
     pub associated_bus: Option<String>,
@@ -244,7 +244,7 @@ impl V1ElectricalDCQualitiesBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1ElectricalDCVoltageValue {
     #[serde(flatten)]
@@ -288,7 +288,7 @@ impl V1ElectricalDCVoltageValueBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1ElectricalDCVoltageMeta {
     pub nominal: Option<f64>,
@@ -345,7 +345,7 @@ impl V1ElectricalDCVoltageMetaBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1ElectricalDCCurrentValue {
     #[serde(flatten)]
@@ -382,7 +382,7 @@ impl V1ElectricalDCCurrentValueBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1ElectricalDCCurrentMeta {
     #[serde(flatten)]
@@ -408,7 +408,7 @@ impl V1ElectricalDCCurrentMeta {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1ElectricalDCTemperatureValue {
     #[serde(flatten)]
@@ -437,7 +437,7 @@ impl V1ElectricalDCTemperatureValue {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1ElectricalACQualities {
     pub associated_bus: Option<String>,
@@ -529,7 +529,7 @@ impl V1ElectricalACQualitiesBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1BatteryTemperature {
     pub limit_discharge_lower: Option<f64>,
@@ -554,7 +554,7 @@ impl V1BatteryTemperature {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1BatteryCapacity {
     pub nominal: Option<f64>,
@@ -632,7 +632,7 @@ impl V1BatteryCapacityBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1Battery {
     #[serde(flatten)]
@@ -705,7 +705,7 @@ impl V1BatteryBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct V1ElectricalInverterMode {
     #[serde(flatten)]
     pub common: Option<V1CommonValueFields>,
@@ -718,14 +718,14 @@ impl V1ElectricalInverterMode {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct V1ElectricalChargerQualities {
     #[serde(flatten)]
     pub common: Option<V1CommonValueFields>,
     pub value: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1Inverter {
     #[serde(flatten)]
@@ -751,7 +751,7 @@ impl V1Inverter {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct V1Charger {
     #[serde(flatten)]
     pub identity: Option<V1ElectricalIdentity>,
@@ -775,7 +775,7 @@ impl V1Charger {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1Alternator {
     #[serde(flatten)]
@@ -849,7 +849,7 @@ impl V1AlternatorBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct V1SolarLoad {
     #[serde(flatten)]
     pub common: Option<V1CommonValueFields>,
@@ -862,7 +862,7 @@ impl V1SolarLoad {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1Solar {
     #[serde(flatten)]
@@ -950,7 +950,7 @@ impl V1SolarBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1ACBus {
     #[serde(flatten)]

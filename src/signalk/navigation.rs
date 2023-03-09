@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::signalk::definitions::V1NumberValue;
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1Navigation {
     // pub course: Option<V1Course>,
@@ -177,7 +177,7 @@ impl V1NavigationBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct V1PositionType {
     pub value: V1PositionValue,
     pub timestamp: String,
@@ -234,7 +234,7 @@ impl V1PositionTypeBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct V1PositionValue {
     pub latitude: f64,
     pub longitude: f64,

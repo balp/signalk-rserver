@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct V1CommonValueFields {
     pub timestamp: String,
     #[serde(rename = "$source")]
@@ -66,7 +66,7 @@ impl V1CommonValueFieldsBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct V1NumberValue {
     pub value: f64,
     pub timestamp: String,
@@ -124,7 +124,7 @@ impl V1NumberValueBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1Meta {
     pub description: String,
@@ -282,7 +282,7 @@ impl V1MetaBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1MetaProperties {
     pub properties: Option<String>,
@@ -340,7 +340,7 @@ impl V1MetaPropertiesBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1MetaDisplayScale {
     pub lower: f64,
@@ -392,7 +392,7 @@ impl V1MetaDisplayScaleBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1MetaZone {
     pub lower: Option<f64>,
@@ -443,7 +443,7 @@ impl V1MetaZoneBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct V1Attr {
     #[serde(rename = "_mode")]
     pub mode: Option<i64>,

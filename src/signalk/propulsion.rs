@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::signalk::definitions::V1NumberValue;
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1Propulsion {
     pub label: String,
@@ -129,7 +129,7 @@ impl V1PropulsionBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "lowercase")]
 pub enum V1PropulsionState {
     Stopped,

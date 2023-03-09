@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::signalk::definitions::{V1CommonValueFields, V1NumberValue};
 use crate::signalk::sources::V1Source;
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct V1Environment {
     pub outside: Option<V1EnvironmentOutside>,
     pub inside: Option<V1EnvironmentInside>,
@@ -96,7 +96,7 @@ impl V1EnvironmentBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1EnvironmentOutside {
     pub temperature: Option<V1NumberValue>,
@@ -194,7 +194,7 @@ impl V1EnvironmentOutsideBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct V1EnvironmentInside {
     #[serde(flatten)]
     pub zones: HashMap<String, V1EnvironmentZone>,
@@ -221,7 +221,7 @@ impl V1EnvironmentInsideBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1EnvironmentZone {
     pub temperature: Option<V1NumberValue>,
@@ -299,7 +299,7 @@ impl V1EnvironmentZoneBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1EnvironmentWater {
     pub temperature: Option<V1NumberValue>,
@@ -315,7 +315,7 @@ impl V1EnvironmentWater {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1EnvironmentDepth {
     pub below_keel: Option<V1NumberValue>,
@@ -372,7 +372,7 @@ impl V1EnvironmentDepthBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1EnvironmentCurrent {
     #[serde(flatten)]
@@ -381,7 +381,7 @@ pub struct V1EnvironmentCurrent {
     pub values: Option<HashMap<String, V1EnvironmentCurrentType>>,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1EnvironmentCurrentType {
     pub timestamp: Option<String>,
@@ -390,7 +390,7 @@ pub struct V1EnvironmentCurrentType {
     pub value: Option<V1EnvironmentCurrentValue>,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1EnvironmentCurrentValue {
     pub drift: Option<f64>,
@@ -398,7 +398,7 @@ pub struct V1EnvironmentCurrentValue {
     pub set_magnetic: Option<f64>,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1EnvironmentTide {
     pub height_high: Option<V1NumberValue>,
@@ -408,7 +408,7 @@ pub struct V1EnvironmentTide {
     pub time_high: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1EnvironmentWind {
     pub angle_apparent: Option<V1NumberValue>,
@@ -422,7 +422,7 @@ pub struct V1EnvironmentWind {
     pub speed_apparent: Option<V1NumberValue>,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1EnvironmentTime {
     pub millis: Option<i64>,
@@ -479,7 +479,7 @@ impl V1EnvironmentTimeBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1EnvironmentMode {
     pub value: Option<String>,

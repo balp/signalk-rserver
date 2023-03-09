@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::signalk::definitions::V1CommonValueFields;
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct V1Notification {
     pub value: Option<V1NotificationValue>,
     #[serde(flatten)]
@@ -48,7 +48,7 @@ impl V1NotificationBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct V1NotificationValue {
     pub method: Vec<String>,
     pub state: String,

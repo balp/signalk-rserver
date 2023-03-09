@@ -1,25 +1,18 @@
 #![allow(clippy::uninlined_format_args)]
 
+use std::str;
+
+use awc::Client;
 // use std::io::Bytes;
 // use actix_rt::System;
 use awc::error::WsProtocolError;
 use awc::ws::Frame;
-use awc::Client;
 use bytes::Bytes;
 use futures_util::stream::StreamExt;
 use serde::Deserialize;
 use serde_json::Value;
-use signalk_rserver::signalk::delta::V1DeltaFormat;
-use signalk_rserver::signalk::hello::V1Hello;
-use std::str;
 
-#[derive(Debug, Deserialize)]
-#[serde(untagged)]
-enum SignalKWSMessage {
-    Hello(V1Hello),
-    Delta(V1DeltaFormat),
-    Dummy,
-}
+use signalk_rserver::signalk::{SignalKStreamMessage, V1DeltaFormat, V1FullFormat, V1Hello, Storage};
 
 #[derive(Debug)]
 enum SignalKWSState {
@@ -29,11 +22,13 @@ enum SignalKWSState {
 
 struct SignalKUpdater {
     state: SignalKWSState,
+    storage: Storage,
 }
 impl Default for SignalKUpdater {
     fn default() -> Self {
         SignalKUpdater {
             state: SignalKWSState::Disconnected,
+            storage: Storage::default(),
         }
     }
 }
@@ -55,19 +50,26 @@ impl SignalKUpdater {
     fn handle_text_message(&mut self, text: &Bytes) {
         let str_message = str::from_utf8(&text).unwrap();
         println!("    state: {:?} text: {:?}", self.state, str_message);
-        let message: SignalKWSMessage = match serde_json::from_str(str_message) {
-            Ok(x) => x,
+        match serde_json::from_str(str_message) {
+            Ok(message) => {
+                match message {
+                    SignalKStreamMessage::Hello(msg) => {
+                        self.state = SignalKWSState::Connected
+                    }
+                    SignalKStreamMessage::Delta(msg) => {
+                        self.storage.update(msg)
+                    }
+                    _ => ()
+                };
+                ()
+            }
             Err(_) => {
                 let v: Value = serde_json::from_str(str_message).unwrap();
                 println!("    value: {:?}", v);
-                SignalKWSMessage::Dummy
+                ()
             }
         };
-        println!("    to: {:?}", message);
-        match message {
-            SignalKWSMessage::Hello(a) => (self.state = SignalKWSState::Connected),
-            _ => (),
-        }
+        println!("    to: {:?}", self.storage.get());
     }
 }
 

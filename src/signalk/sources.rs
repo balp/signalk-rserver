@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::signalk::definitions::V1Attr;
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct V1Sources {
     #[serde(rename = "_attr")]
     pub type_: Option<V1Attr>,
@@ -41,7 +41,7 @@ impl V1SourcesBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct V1Source {
     pub label: Option<String>,
     #[serde(rename = "type")]
@@ -85,7 +85,7 @@ impl V1SourceBuilder {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 pub struct V1SourceProperty {
     // pub ais: V1SourceAIS,
     // pub n2k: V1SourceN2K,

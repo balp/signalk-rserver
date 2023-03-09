@@ -2,6 +2,8 @@
 //!
 //! `signalk` is a collections of types to serialize and deserialize the
 //! signal-k protocol.
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 pub use definitions::{
     V1Attr, V1CommonValueFields, V1DefSource, V1Meta, V1MetaZone, V1NumberValue,
@@ -39,3 +41,80 @@ pub mod sources;
 pub mod subscribe;
 pub mod unsubscribe;
 pub mod vessel;
+
+/// Type for messages that can be received over the signal-k stream
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[serde(untagged)]
+pub enum SignalKStreamMessage {
+    Hello(V1Hello),
+    Full(V1FullFormat),
+    Delta(V1DeltaFormat),
+    #[default]
+    BadData,
+}
+
+#[derive(Debug, Default)]
+pub struct Storage {
+    data: V1FullFormat,
+}
+
+impl Storage {
+    pub fn update(&mut self, delta: V1DeltaFormat) {
+        if self.data.vessels.is_none() {
+            self.data.vessels = Some(HashMap::new());
+        }
+
+        if let Some(ref mut x) = self.data.vessels {
+            x.insert("urn:mrn:imo:mmsi:366982330".into(),
+                     V1Vessel::builder()
+                         .mmsi("366982330".into())
+                         .navigation(V1Navigation::builder()
+                             .speed_over_ground(V1NumberValue::builder()
+                                 .value(5.6)
+                                 .build())
+                             .build())
+                         .build());
+        }
+    }
+    pub fn get(&self) -> V1FullFormat { // TODO: Implement this
+        (self.data).clone()
+    }
+    pub fn new(data: V1FullFormat) -> Self {
+        Self { data }
+    }
+}
+
+#[cfg(test)]
+mod storage_tests {
+    use serde_json::{Number, Value};
+    use crate::signalk::{Storage, V1DeltaFormat, V1FullFormat, V1Navigation, V1NumberValue, V1UpdateType, V1UpdateValue, V1Vessel};
+
+    #[test]
+    fn get_gives_default() {
+        let storage = Storage::default();
+        let expected = V1FullFormat::default();
+        assert_eq!(expected, storage.get())
+    }
+
+    #[test]
+    fn apply_delta_for_sog() {
+        let mut storage = Storage::default();
+        let expected = V1FullFormat::builder()
+            .add_vessel("urn:mrn:imo:mmsi:366982330".into(), V1Vessel::builder()
+                .mmsi("366982330".into())
+                .navigation(V1Navigation::builder()
+                    .speed_over_ground(V1NumberValue::builder().value(5.6).build())
+                    .build())
+                .build())
+            .build();
+        let delta = V1DeltaFormat::builder()
+            .context("vessels.urn:mrn:imo:mmsi:366982330".into())
+            .add_update(V1UpdateType::builder().add(
+                V1UpdateValue::new("navigation.speedOverGround".into(),Value::Number(Number::from_f64(5.6).unwrap())))
+                .build())
+            .build();
+        storage.update(delta);
+        assert_eq!(expected, storage.get())
+
+    }
+}

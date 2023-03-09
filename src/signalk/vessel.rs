@@ -9,7 +9,7 @@ use crate::signalk::{V1Navigation, V1Propulsion};
 
 /// An object describing an individual vessel. It should be an object in vessels,
 /// named using MMSI or a UUID
-#[derive(Serialize, Deserialize, PartialEq, Debug, Default)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct V1Vessel {
     /// MMSI number of the vessel, if available.
