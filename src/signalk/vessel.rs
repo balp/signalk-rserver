@@ -66,19 +66,14 @@ impl Updatable for V1Vessel {
             for value in values.iter() {
                 dbg!(&value.path);
                 dbg!(&value.value);
-                if value.path == "navigation.speedOverGround" {
-                    if let Some(value) = value.value.as_f64() {
-                        if self.navigation.is_none() {
-                            self.navigation = Some(V1Navigation::default());
-                        }
-                        if let Some(ref mut navigation) = self.navigation {
-                            if navigation.speed_over_ground.is_none() {
-                                navigation.speed_over_ground = Some(V1NumberValue::default());
-                            }
-                            if let Some(ref mut sog) = navigation.speed_over_ground {
-                                sog.value = value;
-                            }
-                        }
+                let v: Vec<&str> = value.path.split('.').collect();
+                dbg!(&v);
+                if v[0] == "navigation" {
+                    if self.navigation.is_none() {
+                        self.navigation = Some(V1Navigation::default());
+                    }
+                    if let Some(ref mut navigation) = self.navigation {
+                        navigation.update(v[1].into(), &value.value);
                     }
                 }
             }
@@ -233,5 +228,25 @@ mod context_tests {
         vessel.apply_update(update);
 
         assert_eq!(vessel.navigation.unwrap().speed_over_ground.unwrap().value, 5.1);
+    }
+
+
+    #[test]
+    fn update_navigation_sog_and_cog_true() {
+        let mut vessel = V1Vessel::builder()
+            .navigation(V1Navigation::builder()
+                .speed_over_ground(V1NumberValue::builder().value(10.0).build())
+                .course_over_ground_true(V1NumberValue::builder().value(0.0).build())
+                .build())
+            .build();
+        let update = V1UpdateType::builder()
+            .add(V1UpdateValue::new("navigation.speedOverGround".into(), Value::Number(Number::from_f64(7.2).unwrap())))
+            .add(V1UpdateValue::new("navigation.courseOverGroundTrue".into(), Value::Number(Number::from_f64(4.71238898).unwrap())))
+            .build();
+
+        vessel.apply_update(update);
+
+        assert_eq!(vessel.navigation.as_ref().unwrap().speed_over_ground.as_ref().unwrap().value, 7.2);
+        assert_eq!(vessel.navigation.as_ref().unwrap().course_over_ground_true.as_ref().unwrap().value, 4.71238898);
     }
 }

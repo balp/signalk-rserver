@@ -41,6 +41,63 @@ impl V1Navigation {
     pub fn builder() -> V1NavigationBuilder {
         V1NavigationBuilder::default()
     }
+
+    pub fn update(&mut self, path: String, value: &serde_json::value::Value) {
+        if path == "courseOverGroundMagnetic" {
+            self.course_over_ground_magnetic = Some(V1NumberValue::builder().json_value(value).build())
+        }
+        if path == "courseOverGroundTrue" {
+            self.course_over_ground_true = Some(V1NumberValue::builder().json_value(value).build())
+        }
+        if path == "courseRhumbline" {
+            self.course_rhumbline = Some(V1NumberValue::builder().json_value(value).build())
+        }
+        if path == "courseGreatCircle" {
+            self.course_great_circle = Some(V1NumberValue::builder().json_value(value).build())
+        }
+        if path == "magneticVariation" {
+            self.magnetic_variation = Some(V1NumberValue::builder().json_value(value).build())
+        }
+        if path == "magneticVariationAgeOfService" {
+            self.magnetic_variation_age_of_service = Some(V1NumberValue::builder().json_value(value).build())
+        }
+        if path == "headingMagnetic" {
+            self.heading_magnetic = Some(V1NumberValue::builder().json_value(value).build())
+        }
+        if path == "magneticDeviation" {
+            self.magnetic_deviation = Some(V1NumberValue::builder().json_value(value).build())
+        }
+        if path == "headingCompass" {
+            self.heading_compass = Some(V1NumberValue::builder().json_value(value).build())
+        }
+        if path == "headingTrue" {
+            self.heading_true = Some(V1NumberValue::builder().json_value(value).build())
+        }
+        // if path == "position" {
+        //     self.position = Some(V1NumberValue::builder().json_value(value).build())
+        // }
+        if path == "rateOfTurn" {
+            self.rate_of_turn = Some(V1NumberValue::builder().json_value(value).build())
+        }
+        if path == "speedOverGround" {
+            self.speed_over_ground = Some(V1NumberValue::builder().json_value(value).build())
+        }
+        if path == "speedThroughWater" {
+            self.speed_through_water = Some(V1NumberValue::builder().json_value(value).build())
+        }
+        if path == "speedThroughWaterTransverse" {
+            self.speed_through_water_transverse = Some(V1NumberValue::builder().json_value(value).build())
+        }
+        if path == "speedThroughWaterLongitudinal" {
+            self.speed_through_water_longitudinal = Some(V1NumberValue::builder().json_value(value).build())
+        }
+        if path == "leewayAngle" {
+            self.leeway_angle = Some(V1NumberValue::builder().json_value(value).build())
+        }
+        if path == "log" {
+            self.log = Some(V1NumberValue::builder().json_value(value).build())
+        }
+    }
 }
 
 #[derive(Default)]

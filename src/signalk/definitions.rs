@@ -93,6 +93,12 @@ pub struct V1NumberValueBuilder {
 }
 
 impl V1NumberValueBuilder {
+    pub fn json_value(mut self, value: &serde_json::Value) -> V1NumberValueBuilder {
+        if let Some(f64_value) = value.as_f64() {
+            self.value = f64_value;
+        }
+        self
+    }
     pub fn value(mut self, value: f64) -> V1NumberValueBuilder {
         self.value = value;
         self
