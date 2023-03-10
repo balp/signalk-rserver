@@ -4,14 +4,30 @@ use serde::{Deserialize, Serialize};
 
 use crate::signalk::{V1Sources, V1UpdateType, V1Vessel};
 
-pub trait Updateable {
+/// These items can be updated by a V1UpdateType
+///
+/// Given the GetContext Trait one can fine a matching object
+/// to apply the update into from the V1DeltaFormat's context
+pub trait Updatable {
+    /// This will change the found object to have a a new value
     fn apply_update(&mut self, update: V1UpdateType);
+
+    /// This will return the ID if possible for the object
+    ///
+    /// At the moment this is mainly to make sure we can easily
+    /// verify the GetContext functionality
     fn id(&self) -> String;
+
+    /// This will return the "type" of the context
+    ///
+    /// At the moment this is mainly to make sure we can easily
+    /// verify the GetContext functionality
     fn type_name(&self) -> String;
 }
 
+/// To get an updatable context that matches the V1DeltaFormat
 pub trait GetContext {
-    fn get_context(&self, context: String) -> Option<Box<dyn Updateable>>;
+    fn get_context(&self, context: String) -> Option<Box<dyn Updatable>>;
 }
 
 /// Root structure for Full Signal K data
@@ -35,7 +51,7 @@ pub struct V1FullFormat {
 }
 
 impl GetContext for V1FullFormat {
-    fn get_context(&self, context: String) -> Option<Box<dyn Updateable>> {
+    fn get_context(&self, context: String) -> Option<Box<dyn Updatable>> {
         let v: Vec<&str> = context.split('.').collect();
         if v[0] == "vessels" {
             match &self.vessels {
@@ -46,7 +62,7 @@ impl GetContext for V1FullFormat {
                         None => None,
                         Some(vessel) => Some(Box::new(vessel.clone())),
                     }
-                },
+                }
                 _ => None,
             }
         } else {
@@ -129,38 +145,62 @@ impl V1FullFormatBuilder {
 
 #[cfg(test)]
 mod context_tests {
-    use std::ops::Deref;
-    use crate::signalk::{V1FullFormat, V1Vessel, V1Navigation, V1NumberValue};
     use crate::signalk::full::GetContext;
+    use crate::signalk::{V1FullFormat, V1Navigation, V1NumberValue, V1Vessel};
+    use std::ops::Deref;
 
     #[test]
     fn get_existing_mmsi() {
         let data = V1FullFormat::builder()
-            .add_vessel("urn:mrn:imo:mmsi:366982330".into(), V1Vessel::builder()
-                .mmsi("366982330".into())
-                .navigation(V1Navigation::builder()
-                    .speed_over_ground(V1NumberValue::builder().value(5.6).build())
-                    .build())
-                .build())
+            .add_vessel(
+                "urn:mrn:imo:mmsi:366982330".into(),
+                V1Vessel::builder()
+                    .mmsi("366982330".into())
+                    .navigation(
+                        V1Navigation::builder()
+                            .speed_over_ground(V1NumberValue::builder().value(5.6).build())
+                            .build(),
+                    )
+                    .build(),
+            )
             .build();
-        assert_eq!("V1Vessel".to_string(),
-                   data.get_context("vessels.urn:mrn:imo:mmsi:366982330".into()).unwrap().deref().type_name());
-        assert_eq!("366982330".to_string(),
-                   data.get_context("vessels.urn:mrn:imo:mmsi:366982330".into()).unwrap().deref().id());
+        assert_eq!(
+            "V1Vessel".to_string(),
+            data.get_context("vessels.urn:mrn:imo:mmsi:366982330".into())
+                .unwrap()
+                .deref()
+                .type_name()
+        );
+        assert_eq!(
+            "366982330".to_string(),
+            data.get_context("vessels.urn:mrn:imo:mmsi:366982330".into())
+                .unwrap()
+                .deref()
+                .id()
+        );
     }
 
     #[test]
     fn get_other_existing_mmsi() {
         let data = V1FullFormat::builder()
-            .add_vessel("urn:mrn:imo:mmsi:234567890".into(), V1Vessel::builder()
-                .mmsi("234567890".into())
-                .build())
+            .add_vessel(
+                "urn:mrn:imo:mmsi:234567890".into(),
+                V1Vessel::builder().mmsi("234567890".into()).build(),
+            )
             .build();
-        assert_eq!("V1Vessel".to_string(),
-                   data.get_context("vessels.urn:mrn:imo:mmsi:234567890".into()).unwrap().deref().type_name());
-        assert_eq!("234567890".to_string(),
-                   data.get_context("vessels.urn:mrn:imo:mmsi:234567890".into()).unwrap().deref().id());
+        assert_eq!(
+            "V1Vessel".to_string(),
+            data.get_context("vessels.urn:mrn:imo:mmsi:234567890".into())
+                .unwrap()
+                .deref()
+                .type_name()
+        );
+        assert_eq!(
+            "234567890".to_string(),
+            data.get_context("vessels.urn:mrn:imo:mmsi:234567890".into())
+                .unwrap()
+                .deref()
+                .id()
+        );
     }
-
-
 }

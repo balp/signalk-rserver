@@ -12,7 +12,9 @@ use futures_util::stream::StreamExt;
 use serde::Deserialize;
 use serde_json::Value;
 
-use signalk_rserver::signalk::{SignalKStreamMessage, V1DeltaFormat, V1FullFormat, V1Hello, Storage};
+use signalk_rserver::signalk::{
+    SignalKStreamMessage, Storage, V1DeltaFormat, V1FullFormat, V1Hello,
+};
 
 #[derive(Debug)]
 enum SignalKWSState {
@@ -53,13 +55,9 @@ impl SignalKUpdater {
         match serde_json::from_str(str_message) {
             Ok(message) => {
                 match message {
-                    SignalKStreamMessage::Hello(msg) => {
-                        self.state = SignalKWSState::Connected
-                    }
-                    SignalKStreamMessage::Delta(msg) => {
-                        self.storage.update(msg)
-                    }
-                    _ => ()
+                    SignalKStreamMessage::Hello(msg) => self.state = SignalKWSState::Connected,
+                    SignalKStreamMessage::Delta(msg) => self.storage.update(msg),
+                    _ => (),
                 };
                 ()
             }

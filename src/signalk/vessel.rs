@@ -2,11 +2,11 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
+use crate::signalk::{V1Navigation, V1NumberValue, V1Propulsion, V1UpdateType};
 use crate::signalk::electrical::V1Electrical;
 use crate::signalk::environment::V1Environment;
+use crate::signalk::full::{GetContext, Updatable};
 use crate::signalk::notification::V1Notification;
-use crate::signalk::{V1Navigation, V1Propulsion, V1UpdateType};
-use crate::signalk::full::{GetContext, Updateable};
 
 /// An object describing an individual vessel. It should be an object in vessels,
 /// named using MMSI or a UUID
@@ -58,17 +58,41 @@ pub struct V1Vessel {
     pub propulsion: Option<HashMap<String, V1Propulsion>>,
 }
 
-impl Updateable for V1Vessel {
+impl Updatable for V1Vessel {
     fn apply_update(&mut self, update: V1UpdateType) {
-        todo!()
+        dbg!(&update);
+
+        if let Some(ref values) = update.values {
+            for value in values.iter() {
+                dbg!(&value.path);
+                dbg!(&value.value);
+                if value.path == "navigation.speedOverGround" {
+                    if let Some(value) = value.value.as_f64() {
+                        if self.navigation.is_none() {
+                            self.navigation = Some(V1Navigation::default());
+                        }
+                        if let Some(ref mut navigation) = self.navigation {
+                            if navigation.speed_over_ground.is_none() {
+                                navigation.speed_over_ground = Some(V1NumberValue::default());
+                            }
+                            if let Some(ref mut sog) = navigation.speed_over_ground {
+                                sog.value = value;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
     }
 
     fn id(&self) -> String {
         if let Some(ref id) = self.mmsi {
-            return id.clone()
+            return id.clone();
         }
         if let Some(ref id) = self.uuid {
-            return id.clone()
+            return id.clone();
         }
         "".into()
     }
@@ -169,5 +193,45 @@ impl V1VesselBuilder {
             url: self.url,
             mothership_mmsi: self.mothership_mmsi,
         }
+    }
+}
+
+#[cfg(test)]
+mod context_tests {
+    use serde_json::{Number, Value};
+
+    use crate::signalk::{V1Navigation, V1NumberValue, V1UpdateType, V1UpdateValue, V1Vessel};
+    use crate::signalk::full::Updatable;
+
+    #[test]
+    fn update_navigation_sog_12_6_in_existing_tree() {
+        let mut vessel = V1Vessel::builder()
+            .navigation(V1Navigation::builder()
+                .speed_over_ground(V1NumberValue::builder().value(10.0).build())
+                .build())
+            .build();
+        let update = V1UpdateType::builder()
+            .add(V1UpdateValue::new("navigation.speedOverGround".into(), Value::Number(Number::from_f64(12.6).unwrap())))
+            .build();
+
+        vessel.apply_update(update);
+
+        assert_eq!(vessel.navigation.unwrap().speed_over_ground.unwrap().value, 12.6);
+    }
+
+    #[test]
+    fn update_navigation_sog_5_1_in_existing_tree() {
+        let mut vessel = V1Vessel::builder()
+            .navigation(V1Navigation::builder()
+                .speed_over_ground(V1NumberValue::builder().value(10.0).build())
+                .build())
+            .build();
+        let update = V1UpdateType::builder()
+            .add(V1UpdateValue::new("navigation.speedOverGround".into(), Value::Number(Number::from_f64(5.1).unwrap())))
+            .build();
+
+        vessel.apply_update(update);
+
+        assert_eq!(vessel.navigation.unwrap().speed_over_ground.unwrap().value, 5.1);
     }
 }

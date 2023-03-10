@@ -62,6 +62,13 @@ pub struct Storage {
 
 impl Storage {
     pub fn update(&mut self, delta: V1DeltaFormat) {
+
+        // New meta code...
+        // let c = self.data.get_context(dekta.context)
+        // for update in delta.updates
+        //    c.apply_update(update)
+
+
         if self.data.vessels.is_none() {
             self.data.vessels = Some(HashMap::new());
         }
@@ -72,15 +79,21 @@ impl Storage {
                     if let Some(ref value) = values.get(0) {
                         if let Value::Number(ref new_value) = value.value {
                             if let Some(f64_number) = new_value.as_f64() {
-                                x.insert("urn:mrn:imo:mmsi:366982330".into(),
-                                         V1Vessel::builder()
-                                             .mmsi("366982330".into())
-                                             .navigation(V1Navigation::builder()
-                                                 .speed_over_ground(V1NumberValue::builder()
-                                                     .value(f64_number)
-                                                     .build())
-                                                 .build())
-                                             .build());
+                                x.insert(
+                                    "urn:mrn:imo:mmsi:366982330".into(),
+                                    V1Vessel::builder()
+                                        .mmsi("366982330".into())
+                                        .navigation(
+                                            V1Navigation::builder()
+                                                .speed_over_ground(
+                                                    V1NumberValue::builder()
+                                                        .value(f64_number)
+                                                        .build(),
+                                                )
+                                                .build(),
+                                        )
+                                        .build(),
+                                );
                             }
                         }
                     }
@@ -88,7 +101,8 @@ impl Storage {
             }
         }
     }
-    pub fn get(&self) -> V1FullFormat { // TODO: Implement this
+    pub fn get(&self) -> V1FullFormat {
+        // TODO: Implement this
         (self.data).clone()
     }
     pub fn new(data: V1FullFormat) -> Self {
@@ -100,7 +114,10 @@ impl Storage {
 mod storage_tests {
     use serde_json::{Number, Value};
 
-    use crate::signalk::{Storage, V1DeltaFormat, V1FullFormat, V1Navigation, V1NumberValue, V1UpdateType, V1UpdateValue, V1Vessel};
+    use crate::signalk::{
+        Storage, V1DeltaFormat, V1FullFormat, V1Navigation, V1NumberValue, V1UpdateType,
+        V1UpdateValue, V1Vessel,
+    };
 
     #[test]
     fn get_gives_default() {
@@ -113,18 +130,28 @@ mod storage_tests {
     fn apply_delta_for_sog_5_6() {
         let mut storage = Storage::default();
         let expected = V1FullFormat::builder()
-            .add_vessel("urn:mrn:imo:mmsi:366982330".into(), V1Vessel::builder()
-                .mmsi("366982330".into())
-                .navigation(V1Navigation::builder()
-                    .speed_over_ground(V1NumberValue::builder().value(5.6).build())
-                    .build())
-                .build())
+            .add_vessel(
+                "urn:mrn:imo:mmsi:366982330".into(),
+                V1Vessel::builder()
+                    .mmsi("366982330".into())
+                    .navigation(
+                        V1Navigation::builder()
+                            .speed_over_ground(V1NumberValue::builder().value(5.6).build())
+                            .build(),
+                    )
+                    .build(),
+            )
             .build();
         let delta = V1DeltaFormat::builder()
             .context("vessels.urn:mrn:imo:mmsi:366982330".into())
-            .add_update(V1UpdateType::builder().add(
-                V1UpdateValue::new("navigation.speedOverGround".into(), Value::Number(Number::from_f64(5.6).unwrap())))
-                .build())
+            .add_update(
+                V1UpdateType::builder()
+                    .add(V1UpdateValue::new(
+                        "navigation.speedOverGround".into(),
+                        Value::Number(Number::from_f64(5.6).unwrap()),
+                    ))
+                    .build(),
+            )
             .build();
         storage.update(delta);
         assert_eq!(expected, storage.get())
@@ -134,21 +161,30 @@ mod storage_tests {
     fn apply_delta_for_sog_15_8() {
         let mut storage = Storage::default();
         let expected = V1FullFormat::builder()
-            .add_vessel("urn:mrn:imo:mmsi:366982330".into(), V1Vessel::builder()
-                .mmsi("366982330".into())
-                .navigation(V1Navigation::builder()
-                    .speed_over_ground(V1NumberValue::builder().value(15.8).build())
-                    .build())
-                .build())
+            .add_vessel(
+                "urn:mrn:imo:mmsi:366982330".into(),
+                V1Vessel::builder()
+                    .mmsi("366982330".into())
+                    .navigation(
+                        V1Navigation::builder()
+                            .speed_over_ground(V1NumberValue::builder().value(15.8).build())
+                            .build(),
+                    )
+                    .build(),
+            )
             .build();
         let delta = V1DeltaFormat::builder()
             .context("vessels.urn:mrn:imo:mmsi:366982330".into())
-            .add_update(V1UpdateType::builder().add(
-                V1UpdateValue::new("navigation.speedOverGround".into(), Value::Number(Number::from_f64(15.8).unwrap())))
-                .build())
+            .add_update(
+                V1UpdateType::builder()
+                    .add(V1UpdateValue::new(
+                        "navigation.speedOverGround".into(),
+                        Value::Number(Number::from_f64(15.8).unwrap()),
+                    ))
+                    .build(),
+            )
             .build();
         storage.update(delta);
         assert_eq!(expected, storage.get())
     }
 }
-
