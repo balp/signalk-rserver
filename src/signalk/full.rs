@@ -2,7 +2,17 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::signalk::{V1Sources, V1Vessel};
+use crate::signalk::{V1Sources, V1UpdateType, V1Vessel};
+
+pub trait Updateable {
+    fn apply_update(&mut self, update: V1UpdateType);
+    fn id(&self) -> String;
+    fn type_name(&self) -> String;
+}
+
+pub trait GetContext {
+    fn get_context(&self, context: String) -> Option<Box<dyn Updateable>>;
+}
 
 /// Root structure for Full Signal K data
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
@@ -22,6 +32,27 @@ pub struct V1FullFormat {
     // TODO: Add sar
     /// Metadata about the data sources; physical interface, address, protocol, etc.
     pub sources: Option<V1Sources>,
+}
+
+impl GetContext for V1FullFormat {
+    fn get_context(&self, context: String) -> Option<Box<dyn Updateable>> {
+        let v: Vec<&str> = context.split('.').collect();
+        if v[0] == "vessels" {
+            match &self.vessels {
+                Some(vessels) => {
+                    let id = v[1].to_string();
+                    let t = vessels.get(&id);
+                    match t {
+                        None => None,
+                        Some(vessel) => Some(Box::new(vessel.clone())),
+                    }
+                },
+                _ => None,
+            }
+        } else {
+            None
+        }
+    }
 }
 
 impl Default for V1FullFormat {
@@ -94,4 +125,42 @@ impl V1FullFormatBuilder {
             sources: self.sources,
         }
     }
+}
+
+#[cfg(test)]
+mod context_tests {
+    use std::ops::Deref;
+    use crate::signalk::{V1FullFormat, V1Vessel, V1Navigation, V1NumberValue};
+    use crate::signalk::full::GetContext;
+
+    #[test]
+    fn get_existing_mmsi() {
+        let data = V1FullFormat::builder()
+            .add_vessel("urn:mrn:imo:mmsi:366982330".into(), V1Vessel::builder()
+                .mmsi("366982330".into())
+                .navigation(V1Navigation::builder()
+                    .speed_over_ground(V1NumberValue::builder().value(5.6).build())
+                    .build())
+                .build())
+            .build();
+        assert_eq!("V1Vessel".to_string(),
+                   data.get_context("vessels.urn:mrn:imo:mmsi:366982330".into()).unwrap().deref().type_name());
+        assert_eq!("366982330".to_string(),
+                   data.get_context("vessels.urn:mrn:imo:mmsi:366982330".into()).unwrap().deref().id());
+    }
+
+    #[test]
+    fn get_other_existing_mmsi() {
+        let data = V1FullFormat::builder()
+            .add_vessel("urn:mrn:imo:mmsi:234567890".into(), V1Vessel::builder()
+                .mmsi("234567890".into())
+                .build())
+            .build();
+        assert_eq!("V1Vessel".to_string(),
+                   data.get_context("vessels.urn:mrn:imo:mmsi:234567890".into()).unwrap().deref().type_name());
+        assert_eq!("234567890".to_string(),
+                   data.get_context("vessels.urn:mrn:imo:mmsi:234567890".into()).unwrap().deref().id());
+    }
+
+
 }

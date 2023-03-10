@@ -5,7 +5,8 @@ use serde::{Deserialize, Serialize};
 use crate::signalk::electrical::V1Electrical;
 use crate::signalk::environment::V1Environment;
 use crate::signalk::notification::V1Notification;
-use crate::signalk::{V1Navigation, V1Propulsion};
+use crate::signalk::{V1Navigation, V1Propulsion, V1UpdateType};
+use crate::signalk::full::{GetContext, Updateable};
 
 /// An object describing an individual vessel. It should be an object in vessels,
 /// named using MMSI or a UUID
@@ -55,6 +56,26 @@ pub struct V1Vessel {
     // pub performance: Option<V1Performance>,
     /// Engine data, each engine identified by a unique name i.e. Port_Engine
     pub propulsion: Option<HashMap<String, V1Propulsion>>,
+}
+
+impl Updateable for V1Vessel {
+    fn apply_update(&mut self, update: V1UpdateType) {
+        todo!()
+    }
+
+    fn id(&self) -> String {
+        if let Some(ref id) = self.mmsi {
+            return id.clone()
+        }
+        if let Some(ref id) = self.uuid {
+            return id.clone()
+        }
+        "".into()
+    }
+
+    fn type_name(&self) -> String {
+        "V1Vessel".to_string()
+    }
 }
 
 impl V1Vessel {
