@@ -45,7 +45,6 @@ pub struct V1FullFormat {
     pub sources: Option<V1Sources>,
 }
 
-
 impl Default for V1FullFormat {
     fn default() -> Self {
         V1FullFormat {
@@ -109,7 +108,6 @@ impl V1FullFormat {
     }
 }
 
-
 /// Builder for the Signal K Full format structure
 pub struct V1FullFormatBuilder {
     version: String,
@@ -167,7 +165,10 @@ mod context_tests {
 
     use serde_json::{Number, Value};
 
-    use crate::signalk::{V1DeltaFormat, V1FullFormat, V1Navigation, V1NumberValue, V1UpdateType, V1UpdateValue, V1Vessel};
+    use crate::signalk::{
+        V1DeltaFormat, V1FullFormat, V1Navigation, V1NumberValue, V1UpdateType, V1UpdateValue,
+        V1Vessel,
+    };
 
     #[test]
     fn update_existing_mmsi() {
@@ -186,32 +187,64 @@ mod context_tests {
             .build();
         let delta = V1DeltaFormat::builder()
             .context("vessels.urn:mrn:imo:mmsi:366982330".into())
-            .add_update(V1UpdateType::builder()
-                .add(V1UpdateValue::new("navigation.speedOverGround".into(),
-                                        Value::Number(Number::from_f64(5.1).unwrap())))
-                .build()
-            ).build();
+            .add_update(
+                V1UpdateType::builder()
+                    .add(V1UpdateValue::new(
+                        "navigation.speedOverGround".into(),
+                        Value::Number(Number::from_f64(5.1).unwrap()),
+                    ))
+                    .build(),
+            )
+            .build();
         data.apply_delta(&delta);
-        assert_eq!(data.vessels.as_ref().unwrap()
-                       .get("urn:mrn:imo:mmsi:366982330").as_ref().unwrap()
-                       .navigation.as_ref().unwrap().speed_over_ground.as_ref().unwrap().value, 5.1)
+        assert_eq!(
+            data.vessels
+                .as_ref()
+                .unwrap()
+                .get("urn:mrn:imo:mmsi:366982330")
+                .as_ref()
+                .unwrap()
+                .navigation
+                .as_ref()
+                .unwrap()
+                .speed_over_ground
+                .as_ref()
+                .unwrap()
+                .value,
+            5.1
+        )
     }
     #[test]
     fn update_new_mmsi() {
-        let mut data = V1FullFormat::builder()
-            .build();
+        let mut data = V1FullFormat::builder().build();
 
         let delta = V1DeltaFormat::builder()
             .context("vessels.urn:mrn:imo:mmsi:366982330".into())
-            .add_update(V1UpdateType::builder()
-                .add(V1UpdateValue::new("navigation.speedOverGround".into(),
-                                        Value::Number(Number::from_f64(5.1).unwrap())))
-                .build()
-            ).build();
+            .add_update(
+                V1UpdateType::builder()
+                    .add(V1UpdateValue::new(
+                        "navigation.speedOverGround".into(),
+                        Value::Number(Number::from_f64(5.1).unwrap()),
+                    ))
+                    .build(),
+            )
+            .build();
         data.apply_delta(&delta);
-        assert_eq!(data.vessels.as_ref().unwrap()
-                       .get("urn:mrn:imo:mmsi:366982330").as_ref().unwrap()
-                       .navigation.as_ref().unwrap().speed_over_ground.as_ref().unwrap().value, 5.1)
+        assert_eq!(
+            data.vessels
+                .as_ref()
+                .unwrap()
+                .get("urn:mrn:imo:mmsi:366982330")
+                .as_ref()
+                .unwrap()
+                .navigation
+                .as_ref()
+                .unwrap()
+                .speed_over_ground
+                .as_ref()
+                .unwrap()
+                .value,
+            5.1
+        )
     }
-
 }

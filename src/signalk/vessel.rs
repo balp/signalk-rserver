@@ -2,11 +2,11 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::signalk::{V1Navigation, V1NumberValue, V1Propulsion, V1UpdateType};
 use crate::signalk::electrical::V1Electrical;
 use crate::signalk::environment::V1Environment;
 use crate::signalk::full::Updatable;
 use crate::signalk::notification::V1Notification;
+use crate::signalk::{V1Navigation, V1NumberValue, V1Propulsion, V1UpdateType};
 
 /// An object describing an individual vessel. It should be an object in vessels,
 /// named using MMSI or a UUID
@@ -58,7 +58,6 @@ pub struct V1Vessel {
     pub propulsion: Option<HashMap<String, V1Propulsion>>,
 }
 
-
 impl Updatable for V1Vessel {
     fn apply_update(&mut self, update: &V1UpdateType) {
         dbg!(&update);
@@ -107,16 +106,12 @@ impl V1Vessel {
             Self::default()
         } else if id_parts[0] != "urn" {
             Self::default()
-        } else if id_parts[1] != "mrn"  {
+        } else if id_parts[1] != "mrn" {
             Self::default()
         } else if id_parts[2] == "signalk" {
-            Self::builder()
-                .uuid(id_parts[4].to_string())
-                .build()
+            Self::builder().uuid(id_parts[4].to_string()).build()
         } else if id_parts[2] == "imo" {
-            Self::builder()
-                .mmsi(id_parts[4].to_string())
-                .build()
+            Self::builder().mmsi(id_parts[4].to_string()).build()
         } else {
             Self::default()
         }
@@ -215,59 +210,102 @@ impl V1VesselBuilder {
 mod context_tests {
     use serde_json::{Number, Value};
 
-    use crate::signalk::{V1Navigation, V1NumberValue, V1UpdateType, V1UpdateValue, V1Vessel};
     use crate::signalk::full::Updatable;
+    use crate::signalk::{V1Navigation, V1NumberValue, V1UpdateType, V1UpdateValue, V1Vessel};
 
     #[test]
     fn update_navigation_sog_12_6_in_existing_tree() {
         let mut vessel = V1Vessel::builder()
-            .navigation(V1Navigation::builder()
-                .speed_over_ground(V1NumberValue::builder().value(10.0).build())
-                .build())
+            .navigation(
+                V1Navigation::builder()
+                    .speed_over_ground(V1NumberValue::builder().value(10.0).build())
+                    .build(),
+            )
             .build();
         let update = V1UpdateType::builder()
-            .add(V1UpdateValue::new("navigation.speedOverGround".into(), Value::Number(Number::from_f64(12.6).unwrap())))
+            .add(V1UpdateValue::new(
+                "navigation.speedOverGround".into(),
+                Value::Number(Number::from_f64(12.6).unwrap()),
+            ))
             .build();
 
         vessel.apply_update(&update);
 
-        assert_eq!(vessel.navigation.unwrap().speed_over_ground.unwrap().value, 12.6);
+        assert_eq!(
+            vessel.navigation.unwrap().speed_over_ground.unwrap().value,
+            12.6
+        );
     }
 
     #[test]
     fn update_navigation_sog_5_1_in_existing_tree() {
         let mut vessel = V1Vessel::builder()
-            .navigation(V1Navigation::builder()
-                .speed_over_ground(V1NumberValue::builder().value(10.0).build())
-                .build())
+            .navigation(
+                V1Navigation::builder()
+                    .speed_over_ground(V1NumberValue::builder().value(10.0).build())
+                    .build(),
+            )
             .build();
         let update = V1UpdateType::builder()
-            .add(V1UpdateValue::new("navigation.speedOverGround".into(), Value::Number(Number::from_f64(5.1).unwrap())))
+            .add(V1UpdateValue::new(
+                "navigation.speedOverGround".into(),
+                Value::Number(Number::from_f64(5.1).unwrap()),
+            ))
             .build();
 
         vessel.apply_update(&update);
 
-        assert_eq!(vessel.navigation.unwrap().speed_over_ground.unwrap().value, 5.1);
+        assert_eq!(
+            vessel.navigation.unwrap().speed_over_ground.unwrap().value,
+            5.1
+        );
     }
-
 
     #[test]
     fn update_navigation_sog_and_cog_true() {
         let mut vessel = V1Vessel::builder()
-            .navigation(V1Navigation::builder()
-                .speed_over_ground(V1NumberValue::builder().value(10.0).build())
-                .course_over_ground_true(V1NumberValue::builder().value(0.0).build())
-                .build())
+            .navigation(
+                V1Navigation::builder()
+                    .speed_over_ground(V1NumberValue::builder().value(10.0).build())
+                    .course_over_ground_true(V1NumberValue::builder().value(0.0).build())
+                    .build(),
+            )
             .build();
         let update = V1UpdateType::builder()
-            .add(V1UpdateValue::new("navigation.speedOverGround".into(), Value::Number(Number::from_f64(7.2).unwrap())))
-            .add(V1UpdateValue::new("navigation.courseOverGroundTrue".into(), Value::Number(Number::from_f64(4.71238898).unwrap())))
+            .add(V1UpdateValue::new(
+                "navigation.speedOverGround".into(),
+                Value::Number(Number::from_f64(7.2).unwrap()),
+            ))
+            .add(V1UpdateValue::new(
+                "navigation.courseOverGroundTrue".into(),
+                Value::Number(Number::from_f64(4.71238898).unwrap()),
+            ))
             .build();
 
         vessel.apply_update(&update);
 
-        assert_eq!(vessel.navigation.as_ref().unwrap().speed_over_ground.as_ref().unwrap().value, 7.2);
-        assert_eq!(vessel.navigation.as_ref().unwrap().course_over_ground_true.as_ref().unwrap().value, 4.71238898);
+        assert_eq!(
+            vessel
+                .navigation
+                .as_ref()
+                .unwrap()
+                .speed_over_ground
+                .as_ref()
+                .unwrap()
+                .value,
+            7.2
+        );
+        assert_eq!(
+            vessel
+                .navigation
+                .as_ref()
+                .unwrap()
+                .course_over_ground_true
+                .as_ref()
+                .unwrap()
+                .value,
+            4.71238898
+        );
     }
 
     #[test]

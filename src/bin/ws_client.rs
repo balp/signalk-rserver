@@ -60,8 +60,7 @@ impl SignalKUpdater {
                         if let Some(ref value) = msg.self_ {
                             self.storage.set_self(&value);
                         }
-
-                    },
+                    }
                     SignalKStreamMessage::Delta(msg) => self.storage.update(&msg),
                     _ => (),
                 };
