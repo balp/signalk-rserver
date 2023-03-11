@@ -61,45 +61,11 @@ pub struct Storage {
 }
 
 impl Storage {
-    pub fn update(&mut self, delta: V1DeltaFormat) {
-
-        // New meta code...
-        // let c = self.data.get_context(dekta.context)
-        // for update in delta.updates
-        //    c.apply_update(update)
-
-
-        if self.data.vessels.is_none() {
-            self.data.vessels = Some(HashMap::new());
-        }
-
-        if let Some(ref mut x) = self.data.vessels {
-            if let Some(ref first_update) = delta.updates.get(0) {
-                if let Some(ref values) = first_update.values {
-                    if let Some(ref value) = values.get(0) {
-                        if let Value::Number(ref new_value) = value.value {
-                            if let Some(f64_number) = new_value.as_f64() {
-                                x.insert(
-                                    "urn:mrn:imo:mmsi:366982330".into(),
-                                    V1Vessel::builder()
-                                        .mmsi("366982330".into())
-                                        .navigation(
-                                            V1Navigation::builder()
-                                                .speed_over_ground(
-                                                    V1NumberValue::builder()
-                                                        .value(f64_number)
-                                                        .build(),
-                                                )
-                                                .build(),
-                                        )
-                                        .build(),
-                                );
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    pub fn set_self(&mut self, value: &str) {
+        self.data.self_ = value.to_string();
+    }
+    pub fn update(&mut self, delta: &V1DeltaFormat) {
+        self.data.apply_delta(delta);
     }
     pub fn get(&self) -> V1FullFormat {
         // TODO: Implement this
@@ -153,7 +119,7 @@ mod storage_tests {
                     .build(),
             )
             .build();
-        storage.update(delta);
+        storage.update(&delta);
         assert_eq!(expected, storage.get())
     }
 
@@ -184,7 +150,7 @@ mod storage_tests {
                     .build(),
             )
             .build();
-        storage.update(delta);
+        storage.update(&delta);
         assert_eq!(expected, storage.get())
     }
 }

@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::signalk::{V1Navigation, V1NumberValue, V1Propulsion, V1UpdateType};
 use crate::signalk::electrical::V1Electrical;
 use crate::signalk::environment::V1Environment;
-use crate::signalk::full::{GetContext, Updatable};
+use crate::signalk::full::Updatable;
 use crate::signalk::notification::V1Notification;
 
 /// An object describing an individual vessel. It should be an object in vessels,
@@ -58,8 +58,9 @@ pub struct V1Vessel {
     pub propulsion: Option<HashMap<String, V1Propulsion>>,
 }
 
+
 impl Updatable for V1Vessel {
-    fn apply_update(&mut self, update: V1UpdateType) {
+    fn apply_update(&mut self, update: &V1UpdateType) {
         dbg!(&update);
 
         if let Some(ref values) = update.values {
@@ -78,8 +79,6 @@ impl Updatable for V1Vessel {
                 }
             }
         }
-
-
     }
 
     fn id(&self) -> String {
@@ -100,6 +99,27 @@ impl Updatable for V1Vessel {
 impl V1Vessel {
     pub fn builder() -> V1VesselBuilder {
         V1VesselBuilder::default()
+    }
+
+    pub fn new_with_id(id: &str) -> Self {
+        let id_parts: Vec<&str> = id.split(':').collect();
+        if id_parts.len() != 5 {
+            Self::default()
+        } else if id_parts[0] != "urn" {
+            Self::default()
+        } else if id_parts[1] != "mrn"  {
+            Self::default()
+        } else if id_parts[2] == "signalk" {
+            Self::builder()
+                .uuid(id_parts[4].to_string())
+                .build()
+        } else if id_parts[2] == "imo" {
+            Self::builder()
+                .mmsi(id_parts[4].to_string())
+                .build()
+        } else {
+            Self::default()
+        }
     }
 }
 
@@ -209,7 +229,7 @@ mod context_tests {
             .add(V1UpdateValue::new("navigation.speedOverGround".into(), Value::Number(Number::from_f64(12.6).unwrap())))
             .build();
 
-        vessel.apply_update(update);
+        vessel.apply_update(&update);
 
         assert_eq!(vessel.navigation.unwrap().speed_over_ground.unwrap().value, 12.6);
     }
@@ -225,7 +245,7 @@ mod context_tests {
             .add(V1UpdateValue::new("navigation.speedOverGround".into(), Value::Number(Number::from_f64(5.1).unwrap())))
             .build();
 
-        vessel.apply_update(update);
+        vessel.apply_update(&update);
 
         assert_eq!(vessel.navigation.unwrap().speed_over_ground.unwrap().value, 5.1);
     }
@@ -244,9 +264,14 @@ mod context_tests {
             .add(V1UpdateValue::new("navigation.courseOverGroundTrue".into(), Value::Number(Number::from_f64(4.71238898).unwrap())))
             .build();
 
-        vessel.apply_update(update);
+        vessel.apply_update(&update);
 
         assert_eq!(vessel.navigation.as_ref().unwrap().speed_over_ground.as_ref().unwrap().value, 7.2);
         assert_eq!(vessel.navigation.as_ref().unwrap().course_over_ground_true.as_ref().unwrap().value, 4.71238898);
+    }
+
+    #[test]
+    fn new_from_id() {
+        let vessel = V1Vessel::new_with_id("urn:mrn:imo:mmsi:366982330");
     }
 }
