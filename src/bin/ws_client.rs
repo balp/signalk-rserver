@@ -36,7 +36,6 @@ impl Default for SignalKUpdater {
 }
 impl SignalKUpdater {
     pub fn handle_ws_frame(&mut self, result: Result<Frame, WsProtocolError>) {
-        println!("handle_ws_frame {:?}", result);
         let response = result.unwrap();
         match response {
             Frame::Text(text) => self.handle_text_message(&text),
@@ -51,7 +50,6 @@ impl SignalKUpdater {
 
     fn handle_text_message(&mut self, text: &Bytes) {
         let str_message = str::from_utf8(&text).unwrap();
-        println!("    state: {:?} text: {:?}", self.state, str_message);
         match serde_json::from_str(str_message) {
             Ok(message) => {
                 match message {
@@ -85,7 +83,7 @@ async fn main() {
         .await
         .unwrap();
 
-    for _ in 0..10 {
+    for _ in 0..50 {
         let option = connection.next().await;
         let res_1 = option.unwrap();
         sk_handler.handle_ws_frame(res_1);

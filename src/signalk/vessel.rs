@@ -60,14 +60,9 @@ pub struct V1Vessel {
 
 impl Updatable for V1Vessel {
     fn apply_update(&mut self, update: &V1UpdateType) {
-        dbg!(&update);
-
         if let Some(ref values) = update.values {
             for value in values.iter() {
-                dbg!(&value.path);
-                dbg!(&value.value);
                 let v: Vec<&str> = value.path.split('.').collect();
-                dbg!(&v);
                 if v[0] == "navigation" {
                     if self.navigation.is_none() {
                         self.navigation = Some(V1Navigation::default());
@@ -75,6 +70,8 @@ impl Updatable for V1Vessel {
                     if let Some(ref mut navigation) = self.navigation {
                         navigation.update(v[1].into(), &value.value);
                     }
+                } else {
+                    dbg!(&value.path);
                 }
             }
         }
