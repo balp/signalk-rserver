@@ -6,7 +6,7 @@ async fn main() {
     let client = Client::default();
 
     let req = client
-        .get("http://homenuc:3002/signalk/v1/api/")
+        .get("http://demo.signalk.org/signalk/v1/api/")
         .insert_header(("User-Agent", "awc/3.0"));
     let mut res = req.send().await.unwrap();
 

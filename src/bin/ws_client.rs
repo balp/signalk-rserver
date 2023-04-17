@@ -3,8 +3,6 @@
 use std::str;
 
 use awc::Client;
-// use std::io::Bytes;
-// use actix_rt::System;
 use awc::error::WsProtocolError;
 use awc::ws::Frame;
 use bytes::Bytes;

@@ -17,4 +17,5 @@ futures-util = { version = "0.3.26", default-features = false, features = ["allo
 bytes = "1"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-env_logger = "0.9"
+env_logger = "0.10"
+signalk = "0.2"

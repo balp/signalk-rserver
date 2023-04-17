@@ -1,12 +1,11 @@
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder, Result};
 use serde_json::json;
 
-use signalk_rserver::signalk::full;
+use signalk::V1FullFormat;
 
-mod signalk;
 
 #[get("/signalk/v1/api/")]
-async fn signalk_v1(data: web::Data<full::V1FullFormat>) -> Result<impl Responder> {
+async fn signalk_v1(data: web::Data<V1FullFormat>) -> Result<impl Responder> {
     Ok(web::Json(data))
 }
 
@@ -33,13 +32,13 @@ async fn main() -> std::io::Result<()> {
     // let self_link = format!("vessels.urn:mrn:signalk:uuid:{self_uuid}");
     HttpServer::new(|| {
         App::new()
-            .app_data(web::Data::new(full::V1FullFormat {
+            .app_data(web::Data::new(V1FullFormat {
                 // vessels: signalk::V1VesselFormat{ mmsi: "826512345".to_string()},
                 version: "1.7.0".to_string(),
                 self_: "vessels.urn:mrn:signalk:uuid:d6d08b72-88e2-4911-9429-ede4d5819549"
                     .to_string(),
                 vessels: None,
-                sources: None,
+                // sources: None,
             }))
             .service(signalk_discovery)
             .service(signalk_v1)
